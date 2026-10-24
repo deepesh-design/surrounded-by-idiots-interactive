@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Surrounded by Idiots Interactive</title>
+<style>
+/* Apple-style: system type, large titles, translucent chrome, borderless grouped cards, capsule controls, spring-like easing. */
+:root{
+  --bg:#F5F5F7; --panel:#FFFFFF; --ink:#1D1D1F; --muted:#6E6E73; --line:rgba(0,0,0,.08); --chip:#F2F2F7;
+  --R:#FF3B30; --Y:#D98E00; --G:#2DB44E; --B:#0A7AFF; --N:#8E8E93;
+  --Rbg:rgba(255,59,48,.11); --Ybg:rgba(255,176,0,.17); --Gbg:rgba(48,182,80,.12); --Bbg:rgba(10,122,255,.11); --Nbg:rgba(142,142,147,.14);
+  --bar:rgba(245,245,247,.72); --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 30px rgba(0,0,0,.06);
+  --ease:cubic-bezier(.32,.72,0,1);
+  --sys:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#000; --panel:#1C1C1E; --ink:#F5F5F7; --muted:#98989F; --line:rgba(255,255,255,.1); --chip:#2C2C2E;
+    --R:#FF453A; --Y:#FFD60A; --G:#32D74B; --B:#0A84FF; --N:#8E8E93;
+    --Rbg:rgba(255,69,58,.2); --Ybg:rgba(255,214,10,.17); --Gbg:rgba(50,215,75,.18); --Bbg:rgba(10,132,255,.2); --Nbg:rgba(142,142,147,.2);
+    --bar:rgba(0,0,0,.66); --shadow:none; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000; --panel:#1C1C1E; --ink:#F5F5F7; --muted:#98989F; --line:rgba(255,255,255,.1); --chip:#2C2C2E;
+  --R:#FF453A; --Y:#FFD60A; --G:#32D74B; --B:#0A84FF; --N:#8E8E93;
+  --Rbg:rgba(255,69,58,.2); --Ybg:rgba(255,214,10,.17); --Gbg:rgba(50,215,75,.18); --Bbg:rgba(10,132,255,.2); --Nbg:rgba(142,142,147,.2);
+  --bar:rgba(0,0,0,.66); --shadow:none; color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.47 var(--sys);letter-spacing:-.011em;-webkit-font-smoothing:antialiased;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+button{font:inherit;color:inherit;cursor:pointer;letter-spacing:inherit}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+.wrap{max-width:780px;margin:0 auto}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--B) 60%,transparent);outline-offset:2px}
+button:active:not(:disabled),.opt:active:not(:disabled),.fl:active{transform:scale(.97);transition:transform .1s ease-out}
+
+/* translucent chrome */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px))) 0 calc(-1*max(16px,env(safe-area-inset-right,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);box-shadow:0 .5px 0 var(--line);display:flex;align-items:center;gap:12px}
+.top .nm{font-weight:600;font-size:15px;white-space:nowrap}
+.pbar{flex:1;height:4px;border-radius:2px;background:var(--line);overflow:hidden;min-width:40px}
+.pbar i{display:block;height:100%;width:0;border-radius:2px;background:var(--B);transition:width .7s var(--ease)}
+.cnt{font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ibtn{border:0;background:var(--Bbg);color:var(--B);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
+#drawer{position:fixed;z-index:25;top:0;bottom:0;left:0;width:min(340px,88vw);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(30px);backdrop-filter:saturate(180%) blur(30px);padding:calc(64px + env(safe-area-inset-top,0px)) 10px 24px;overflow:auto;transform:translateX(-104%);transition:transform .5s var(--ease);box-shadow:8px 0 40px rgba(0,0,0,.18)}
+#drawer.open{transform:none}
+#drawer a{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;color:inherit;text-decoration:none;font-size:15px;line-height:1.3}
+#drawer a:hover{background:var(--line)}
+#drawer .dn{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+#drawer .ck{margin-left:auto;color:var(--G);font-weight:700}
+
+/* type */
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--c,var(--muted))}
+.lesson h2,.hero h1{font-weight:700}
+.lesson>h2{font-size:clamp(34px,6.4vw,52px);line-height:1.05;letter-spacing:-.03em;margin:6px 0 14px}
+.intro{font-size:clamp(19px,2.6vw,22px);line-height:1.4;color:var(--muted);margin:0 0 8px;max-width:30em;letter-spacing:-.016em}
+
+/* hero */
+.hero{padding:56px 0 20px;display:grid;gap:22px;text-align:center;justify-items:center}
+.hero h1{font-size:clamp(40px,8.4vw,76px);line-height:1.03;letter-spacing:-.04em}
+.hero .intro{margin:0 auto}
+.hero h2{font-size:26px;letter-spacing:-.025em;font-weight:700}
+.cta{background:var(--B);color:#fff;border:0;border-radius:999px;padding:14px 28px;font-weight:600;font-size:17px;transition:transform .1s,filter .2s}
+.cta:hover{filter:brightness(1.08)}
+.meet{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px;text-align:left;width:100%}
+.meet .mc{border-radius:26px;padding:20px 18px 18px;background:var(--panel);box-shadow:var(--shadow);min-width:0}
+.meet .mc .av{margin:0 0 12px}
+.meet .mc h3{color:var(--c);font-size:24px;letter-spacing:-.02em;margin:0}
+.meet .mc .role{font-weight:600;margin:0 0 6px}
+.meet .mc p{font-size:15px;line-height:1.4;color:var(--muted)}
+.meet .mc .says{margin-top:14px;padding:10px 12px;border-radius:14px;background:var(--cbg);font-weight:600;font-size:15px;color:var(--ink);line-height:1.3}
+.meet .mc small{display:block;color:var(--muted);font-size:11px;font-weight:500;margin-bottom:3px}
+.words{max-width:36em;font-size:14px;line-height:1.5;color:var(--muted);text-align:left}
+.words b{color:var(--ink);font-weight:600}
+
+/* avatars */
+.av{width:56px;height:56px;display:block;animation:bob 4s ease-in-out infinite}
+.av .eye{transform-origin:center;transform-box:fill-box;animation:blink 5s infinite}
+@keyframes bob{50%{transform:translateY(-3px)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+
+/* sections */
+.sec{padding:0;scroll-margin-top:70px}
+.lesson{padding:72px 0 8px;scroll-margin-top:50px}
+.lesson+.lesson{border-top:.5px solid var(--line)}
+.big{font-size:clamp(28px,5.4vw,46px);line-height:1.08;letter-spacing:-.032em;font-weight:700;margin:26px 0 26px;text-wrap:balance;color:var(--ink)}
+.big small{display:block;font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
+.mod{background:var(--panel);border-radius:28px;padding:clamp(18px,3.4vw,28px);margin:16px 0;box-shadow:var(--shadow)}
+.mod>h3{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+.sub{margin:0 0 16px;color:var(--muted);font-size:16px;line-height:1.4}
+.js .rv{opacity:0;transform:translateY(20px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.js .rv.in{opacity:1;transform:none}
+.done-row{display:flex;justify-content:center;margin:26px 0 0}
+.donebtn{border:0;background:var(--chip);border-radius:999px;padding:11px 22px;font-weight:600;color:var(--muted);transition:background .3s,color .3s}
+.donebtn.on{background:var(--G);color:#fff}
+.sowhat{margin:16px 0 0;padding:20px 22px;border-radius:24px;background:var(--cbg)}
+.sowhat b{display:block;font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--c);margin-bottom:4px}
+.sowhat{font-size:18px;line-height:1.4;letter-spacing:-.015em}
+
+/* buttons */
+.nextbtn{margin-top:14px;border:0;background:var(--B);color:#fff;border-radius:999px;padding:11px 22px;font-weight:600}
+.nextbtn[hidden]{display:none}
+.nextbtn:disabled{opacity:.4}
+.ghost{border:0;background:var(--chip);border-radius:999px;padding:11px 20px;font-weight:600}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:0;background:var(--chip);border-radius:999px;padding:9px 16px;font-weight:600;font-size:15px;transition:background .25s,color .25s}
+.pill.on{color:#fff}
+.pill:disabled{opacity:.4}
+
+/* chat */
+.chat{display:flex;flex-direction:column;gap:8px;max-width:560px}
+.bub{display:flex;gap:10px;align-items:flex-end;animation:pop .5s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.94)}}
+.bub .av{width:34px;height:34px;flex:none;animation:none}
+.bub .tx{padding:10px 15px;border-radius:20px 20px 20px 6px;max-width:84%;border:0!important;line-height:1.35}
+.bub .tx b{display:block;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;margin-bottom:1px}
+.typing{display:inline-flex;gap:4px;padding:6px 2px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{50%{transform:translateY(-4px);opacity:.4}}
+
+/* questions: inset grouped list */
+.q{font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.025em;margin:0 0 14px}
+.opts{display:grid;gap:0;background:var(--chip);border-radius:18px;overflow:hidden}
+.opt{text-align:left;border:0;border-top:.5px solid var(--line);background:transparent;padding:15px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center;transition:background .2s}
+.opt:first-child{border-top:0}
+.opt:hover:not(:disabled){background:var(--line)}
+.opt.ok{background:var(--Gbg);font-weight:600}
+.opt.ok:after{content:"✓";color:var(--G);font-weight:700}
+.opt.bad{background:var(--Rbg);animation:shake .4s}
+.opt.bad:after{content:"✕";color:var(--R);font-weight:700}
+.opt:disabled{cursor:default;color:var(--ink)}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.fb{margin:14px 0 0;padding:14px 16px;border-radius:16px;background:var(--chip);font-size:16px}
+.mq .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.mailbox{font:14px/1.5 ui-monospace,"SF Mono",Menlo,monospace;background:var(--chip);border-radius:16px;padding:14px 16px;margin:0 0 14px;white-space:pre-wrap}
+
+/* flip cards */
+.flips{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:10px}
+.fl{perspective:900px;border:0;background:none;padding:0;min-height:150px;text-align:left}
+.fl .in{position:relative;width:100%;height:100%;min-height:150px;transition:transform .8s var(--ease);transform-style:preserve-3d}
+.fl.f .in{transform:rotateY(180deg)}
+.fl .s{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;padding:16px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.fl .s b{font-size:22px;font-weight:700;letter-spacing:-.025em}
+.fl .s .hint{font-size:12px;opacity:.7;margin:0}
+.fl .back{transform:rotateY(180deg);font-weight:500;line-height:1.3}
+
+/* static visuals */
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;margin-top:10px}
+.flow .st{flex:1 1 130px;padding:14px;border-radius:18px;background:var(--chip);font-weight:600;line-height:1.3}
+.flow .st:before{content:"";display:block;width:22px;height:4px;border-radius:2px;background:var(--c,var(--N));margin-bottom:10px}
+.flow .ar{align-self:center;color:var(--muted);font-size:18px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.col{padding:16px 18px;border-radius:20px;background:var(--chip);min-width:0}
+.col h4{margin:0 0 4px;font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+.col.good h4{color:var(--G)}.col.bad h4{color:var(--R)}
+.col ul{list-style:none;margin:0;padding:0}.col li{padding:7px 0;border-top:.5px solid var(--line)}.col li:first-child{border:0}
+.bars{display:grid;gap:14px;max-width:640px;margin-top:12px}
+.bars .lb{display:flex;justify-content:space-between;font-size:15px;margin-bottom:5px;gap:10px}
+.bars .tr{height:14px;background:var(--chip);border-radius:7px;overflow:hidden}
+.bars .fi{height:100%;width:0;border-radius:7px;transition:width 1.2s var(--ease)}
+.quote{font-size:clamp(22px,3.8vw,32px);line-height:1.22;font-weight:700;letter-spacing:-.028em}
+.quote small{display:block;font-size:15px;font-weight:400;letter-spacing:-.011em;color:var(--muted);margin-top:8px}
+.traits{display:flex;gap:8px;flex-wrap:wrap}
+.traits span{padding:7px 14px;border-radius:999px;font-weight:600;font-size:15px;background:var(--cbg);color:var(--c)}
+.prof{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.prof .av{width:92px;height:92px}
+.prof h3{font-size:26px;letter-spacing:-.025em;color:var(--c)}
+.steps{display:grid;gap:8px;counter-reset:s;max-width:620px;margin-top:10px}
+.steps div{display:flex;gap:14px;align-items:center;padding:13px 16px;border-radius:18px;background:var(--chip)}
+.steps div:before{counter-increment:s;content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--c,var(--N));color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center}
+.tl{position:relative;padding-left:28px;max-width:600px;margin-top:10px}
+.tl:before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:2px;border-radius:1px;background:var(--line)}
+.tl div{position:relative;padding:0 0 18px}
+.tl div:before{content:"";position:absolute;left:-26px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--B)}
+.tl b{display:block;font-size:19px;letter-spacing:-.02em}
+
+/* games */
+.listen{margin:10px 0 14px}
+.msgrow{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.msg{background:var(--ink);color:var(--bg);padding:13px 16px;border-radius:20px;font-weight:600;line-height:1.3}
+.funnel{width:40px;height:40px;opacity:.5}
+.heard{padding:13px 16px;border-radius:20px;font-weight:600;min-height:64px;background:var(--cbg);color:var(--c);animation:pop .5s var(--ease);line-height:1.3}
+@media (max-width:560px){.msgrow{grid-template-columns:1fr}.funnel{transform:rotate(90deg);margin:0 auto}}
+.onion{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.rings{position:relative;width:240px;height:240px;flex:none}
+.ring{position:absolute;border-radius:50%;border:0;display:grid;place-items:center;font-weight:600;font-size:12px;color:#fff;transition:transform .4s var(--ease),box-shadow .3s}
+.ring:hover{transform:scale(1.03)}
+.ring.sel{box-shadow:0 0 0 4px var(--panel),0 0 0 7px var(--ink)}
+.rbox{flex:1 1 220px;min-width:0;padding:16px 18px;border-radius:20px;background:var(--chip)}
+.mx{position:relative;max-width:440px;aspect-ratio:1;margin:30px 0 30px 30px;display:grid;grid-template-columns:1fr 1fr;gap:6px;touch-action:none;user-select:none}
+.mx .c{border-radius:22px;padding:14px;font-size:19px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:flex-start}
+.mx .ax{position:absolute;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mx .dot{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);cursor:grab;display:grid;place-items:center;color:var(--bg);font-weight:700;touch-action:none}
+.mx .dot:active{cursor:grabbing;transform:scale(1.12)}
+.sky{position:relative;height:220px;border-radius:24px;overflow:hidden;background:linear-gradient(#8E99AB,#C4CCD9);transition:background 1.4s;margin-top:10px}
+.sky.sun{background:linear-gradient(#6EB8F0,#D8EFFD)}
+.cloud{position:absolute;top:26px;left:8%;width:150px;height:56px;background:#F0F2F6;border-radius:40px;box-shadow:40px -18px 0 8px #F0F2F6,-30px 6px 0 -4px #F0F2F6;transition:opacity 1.2s,transform 1.6s var(--ease)}
+.sky.sun .cloud{opacity:0;transform:translateX(160px)}
+.drops{position:absolute;inset:80px 0 0;opacity:0;background:repeating-linear-gradient(105deg,transparent 0 14px,rgba(10,122,255,.5) 14px 16px);animation:rain .5s linear infinite;transition:opacity .5s}
+.sky.wet .drops{opacity:1}.sky.sun .drops{opacity:0}
+@keyframes rain{to{background-position:-30px 40px}}
+.sunny{position:absolute;right:12%;top:20px;width:70px;height:70px;border-radius:50%;background:#FFCC00;box-shadow:0 0 0 14px rgba(255,204,0,.28);opacity:0;transform:scale(.3);transition:all 1.1s var(--ease)}
+.sky.sun .sunny{opacity:1;transform:none}
+.rainbow{position:absolute;left:50%;bottom:-70px;width:300px;height:150px;margin-left:-150px;border-radius:150px 150px 0 0;border:14px solid transparent;border-top-color:#FF3B30;opacity:0;transition:opacity 1.2s .6s}
+.sky.sun .rainbow{opacity:.85;box-shadow:inset 0 14px 0 #FFCC00,inset 0 28px 0 #34C759,inset 0 42px 0 #0A7AFF}
+.sky .who{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:60px}
+.sky .who .av{width:60px;height:60px}
+.say{position:absolute;left:calc(50% + 40px);bottom:60px;background:#fff;color:#1D1D1F;padding:7px 12px;border-radius:14px;font-weight:600;font-size:14px;max-width:170px;box-shadow:0 4px 14px rgba(0,0,0,.18);line-height:1.3}
+.gauge{display:grid;gap:12px;max-width:620px;margin-top:10px}
+.g{display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;font-weight:600;font-size:14px}
+.g .tr{height:12px;background:var(--chip);border-radius:6px;overflow:hidden}
+.g .fi{height:100%;width:0;border-radius:6px;transition:width .6s var(--ease)}
+.hint{color:var(--muted);font-size:14px;margin:10px 0 0}
+.stopw{font-size:56px;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:6px 0}
+.crowd{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:6px;max-width:500px;margin:14px 0}
+.crowd i{height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:700;background:var(--chip);color:var(--muted);transition:all .4s var(--ease)}
+.crowd i.nod{background:var(--G);color:#fff;animation:nod .7s ease infinite alternate}
+@keyframes nod{to{transform:translateY(4px)}}
+input[type=range]{width:100%;max-width:480px;accent-color:var(--B);margin-top:8px}
+.face{display:flex;gap:16px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.face .av{width:76px;height:76px}
+.lean{display:flex;gap:40px;justify-content:center;flex-wrap:wrap;align-items:flex-end;padding:10px 0}
+.lean figure{margin:0;text-align:center;font-weight:600}
+.lean svg{overflow:visible}
+.lean .body{transform-origin:75px 160px;transition:transform 1s var(--ease)}
+.pour{display:flex;gap:26px;align-items:flex-end;flex-wrap:wrap;margin:12px 0 16px}
+.gl{text-align:center;width:130px}
+.cup{position:relative;margin:0 auto;border:3px solid var(--ink);border-top:0;border-radius:0 0 22px 22px;overflow:hidden;background:var(--chip)}
+.cup .liq{position:absolute;left:0;right:0;bottom:0;height:0;transition:height .5s var(--ease);background:var(--c)}
+.gl.spill .cup{animation:shake .4s}
+.gl .lab{font-weight:600;font-size:14px;margin-top:8px}.gl .nt{font-size:12px;color:var(--muted);min-height:2.4em}
+.gl .boom{height:22px;font-weight:700;font-size:13px;color:var(--R)}
+.lanes{display:grid;gap:10px;margin-top:12px}
+.lane{position:relative;height:64px;border-radius:20px;background:var(--cbg);overflow:hidden}
+.lane .run{position:absolute;left:6px;top:6px;width:52px;transition:left var(--dur,3s) var(--ease-r,ease-in-out)}
+.lane .run .av{width:52px;height:52px;animation:none}
+.lane .fin{position:absolute;right:10px;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--ink);opacity:.2}
+.lane .vd{position:absolute;left:70px;right:70px;top:0;bottom:0;display:flex;align-items:center;font-weight:600;font-size:14px;opacity:0;transition:opacity .5s;line-height:1.25}
+.lane .vd.on{opacity:1}
+.lane .tg{position:absolute;right:18px;top:6px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--c)}
+.slots{display:flex;gap:8px;margin:14px 0;flex-wrap:wrap}
+.slot{width:62px;height:62px;border-radius:20px;border:0;background:var(--chip);display:grid;place-items:center;padding:0}
+.slot .av{width:46px;height:46px;animation:none}
+.battery{position:relative;height:42px;border:3px solid var(--ink);border-radius:12px;max-width:400px;padding:3px;margin-top:10px}
+.battery:after{content:"";position:absolute;right:-11px;top:10px;width:6px;height:12px;background:var(--ink);border-radius:0 3px 3px 0}
+.battery i{display:block;height:100%;border-radius:7px;background:var(--R);transition:width .6s var(--ease)}
+.cheat{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:16px}
+.cheat .cc{border-radius:26px;padding:20px;background:var(--panel);box-shadow:var(--shadow);min-width:0}
+.cheat h3{color:var(--c);font-size:26px;letter-spacing:-.025em;margin:10px 0 4px}
+.cheat dt{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-top:12px}
+.cheat dd{margin:2px 0 0;font-size:15px;line-height:1.4}
+.foot{padding:56px 0 80px;color:var(--muted);font-size:13px;text-align:center;max-width:34em;margin:0 auto}
+@media (max-width:640px){.flow .ar{display:none}.flow .st{flex-basis:100%}.two{grid-template-columns:1fr}.hero{padding-top:36px}.lesson{padding-top:56px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:opacity .2s!important}html{scroll-behavior:auto}.js .rv{transform:none}}
+@media (prefers-reduced-transparency:reduce){body::before,.top,#drawer{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--panel)}}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+<div class="top"><button class="ibtn" id="menu" aria-label="Open chapter list">Chapters</button><span class="nm">Surrounded by Idiots</span><div class="pbar"><i id="pfill"></i></div><span class="cnt" id="pcnt">0 / 22</span></div>
+<nav id="drawer" aria-label="Chapters"></nav>
+<main class="wrap">
+  <section class="hero">
+    <h1>Why do some people drive you up the wall?</h1>
+    <p class="intro">People behave in four main ways, and the author gives each a colour. Learn to spot the colour and a lot of "idiots" turn out to be people who work differently from you.</p>
+    <p class="intro" style="margin-top:-8px">I'll guide you. Every lesson has the same four steps: why it matters, a short story, something to play with, and what to do with it tomorrow. No reading the book required.</p>
+    <button class="cta" id="start">Find your colour</button>
+    <h2 style="margin-top:34px">Meet the four colours</h2>
+    <p class="intro" style="margin-top:-12px">Picture four friends planning a weekend trip. Each reacts in their own way.</p>
+    <div class="meet" id="cast"></div>
+    <p class="words"><b>Dominance</b> (Red) takes charge. <b>Inducement</b> (Yellow) wins people over. <b>Submission</b> (Green) is steady and supportive; it doesn't mean weak. <b>Analytic</b> (Blue) checks and compares.</p>
+  </section>
+  <section class="sec" id="finder"></section>
+  <div id="lessons"></div>
+  <section class="sec" id="cheat"></section>
+  <p class="foot">Interactive study guide based on "Surrounded by Idiots" by Thomas Erikson. Explanations and games are written in plain words; the stories come from the book. Any email or quote not from the book is marked as an example.</p>
+</main>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const el=h=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstElementChild};
+const col=k=>`var(--${k})`, cbg=k=>`var(--${k}bg)`;
+const CO={
+  R:{n:"Red",tag:"Dominance",line:"Fast, blunt, wants to win",spot:"Talks first and loudest, interrupts, hates small talk",say:"Short. Main point first. Then the decision.",avoid:"Long intros, rambling, slow replies",trap:"Steamrolls people and skips details",quote:"Skip the intro. What's the decision?"},
+  Y:{n:"Yellow",tag:"Inducement",line:"Talkative, upbeat, big-picture",spot:"Tells stories, laughs a lot, knows everyone",say:"Warm and friendly. Big picture first.",avoid:"Heavy detail, cold tone, long lectures",trap:"Loses focus, runs late, talks over others",quote:"You HAVE to hear what happened last night!"},
+  G:{n:"Green",tag:"Submission",line:"Calm, loyal, hates sudden change",spot:"Quiet, listens, agrees in the meeting, worries after",say:"Patient. Explain why. Small steps. Criticism in private.",avoid:"Sudden change, public pressure",trap:"Avoids conflict and never says what they really think",quote:"Whatever works for everyone is fine with me."},
+  B:{n:"Blue",tag:"Analytic",line:"Exact, careful, wants the facts",spot:"Asks for sources, corrects details, very organised",say:"Facts, preparation, checklists. No vague visions.",avoid:"Sloppy work, hype, guessing",trap:"Over-analyses and takes too long to decide",quote:"Before we decide, can I see the source?"},
+};
+const faceMouth={happy:'M17 33 Q26 43 35 33',mad:'M17 39 Q26 30 35 39',flat:'M19 37 H33',worry:'M17 38 Q21.5 33 26 38 Q30.5 43 35 38',shock:'M22 34 a4 5 0 1 0 8 0 a4 5 0 1 0 -8 0',smirk:'M18 36 Q27 40 35 33'};
+function av(k,mood='happy'){
+  const c=col(k);
+  const brows=k==='R'||mood==='mad'?`<path d="M14 18 L23 22 M38 18 L29 22" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`:'';
+  const specs=k==='B'?`<g fill="none" stroke="#fff" stroke-width="2"><rect x="13" y="20" width="11" height="9" rx="3"/><rect x="28" y="20" width="11" height="9" rx="3"/><path d="M24 24 H28"/></g>`:'';
+  const m=faceMouth[mood]||faceMouth.happy;
+  return `<svg class="av" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="26" fill="${c}"/><g class="eye" fill="#fff"><circle cx="19" cy="25" r="2.6"/><circle cx="33" cy="25" r="2.6"/></g>${brows}${specs}<path d="${m}" stroke="#fff" stroke-width="3" fill="${mood==='shock'?'#fff':'none'}" stroke-linecap="round"/></svg>`;
+}
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------------- modules ---------------- */
+const M={};
+M.big=(m,ch)=>el(`<div class="big rv" style="--c:${col(ch.k)};--cbg:${cbg(ch.k)}"><small>The big idea</small>${m.text}</div>`);
+
+M.chat=m=>{
+  const w=el(`<div class="mod rv"><h3>${m.title||'Story'}</h3><div class="chat"></div><button class="nextbtn">Start</button></div>`);
+  const box=$('.chat',w),btn=$('.nextbtn',w);let i=0,busy=false;
+  const add=async()=>{
+    if(busy)return; busy=true;
+    if(i>=m.lines.length){box.innerHTML='';i=0}
+    const [who,k,text,mood]=m.lines[i];
+    if(who){const t=el(`<div class="bub"><span style="width:42px"></span><div class="tx" style="background:var(--Nbg);border-color:var(--line)"><span class="typing"><i></i><i></i><i></i></span></div></div>`);box.appendChild(t);await sleep(550);t.remove();}
+    box.appendChild(el(`<div class="bub">${who?av(k,mood):'<span style="width:42px"></span>'}<div class="tx" style="background:${cbg(k)};border-color:${col(k)}">${who?`<b style="color:${col(k)}">${who}</b>`:''}${text}</div></div>`));
+    i++; btn.textContent=i>=m.lines.length?'Replay':'Next'; busy=false;
+  };
+  btn.onclick=add; return w;
+};
+
+M.mcq=m=>{
+  const w=el(`<div class="mod rv mq"><h3>${m.title||'Your turn'}</h3><div class="body"></div></div>`);
+  const body=$('.body',w);let i=0,score=0;
+  const show=()=>{
+    if(i>=m.qs.length){
+      body.innerHTML=`<p class="q">You got ${score} of ${m.qs.length}.</p><button class="ghost">Try again</button>`;
+      $('.ghost',body).onclick=()=>{i=0;score=0;show()};return;}
+    const q=m.qs[i];
+    body.innerHTML=`<div class="meta"><span>Question ${i+1} of ${m.qs.length}</span><span>${score} correct</span></div>${q.mail?`<div class="mailbox">${q.mail}</div>`:''}<p class="q">${q.q}</p><div class="opts">${q.o.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join('')}</div><div class="fbx"></div>`;
+    body.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      const j=+b.dataset.j,ok=j===q.a; if(ok)score++;
+      body.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(+x.dataset.j===q.a)x.classList.add('ok')});
+      if(!ok)b.classList.add('bad');
+      $('.fbx',body).innerHTML=`<p class="fb"><b>${ok?'Yes.':'Not quite.'}</b> ${q.fb||''}</p><button class="nextbtn">${i+1<m.qs.length?'Next':'See score'}</button>`;
+      $('.nextbtn',body).onclick=()=>{i++;show()};
+    });
+  };
+  show();return w;
+};
+
+M.flip=m=>{
+  const w=el(`<div class="mod rv"><h3>${m.title||'Tap to flip'}</h3><div class="flips"></div></div>`);
+  m.cards.forEach(c=>{
+    const f=el(`<button class="fl" aria-label="Flip card"><div class="in"><div class="s" style="background:${cbg(c.k)};border:2px solid ${col(c.k)}"><b style="color:${col(c.k)}">${c.front}</b><span class="hint">tap to flip</span></div><div class="s back" style="background:${col(c.k)};color:#fff"><span>${c.back}</span></div></div></button>`);
+    f.onclick=()=>f.classList.toggle('f');$('.flips',w).appendChild(f);
+  });return w;
+};
+
+M.flow=m=>el(`<div class="mod rv"><h3>${m.title||'How it goes'}</h3><div class="flow" style="--c:${col(m.accent||'N')}">${m.steps.map((s,i)=>(i?'<span class="ar">→</span>':'')+`<div class="st">${s}</div>`).join('')}</div></div>`);
+M.steps=m=>el(`<div class="mod rv"><h3>${m.title||'Steps'}</h3><div class="steps" style="--c:${col(m.accent||'N')}">${m.items.map(i=>`<div>${i}</div>`).join('')}</div></div>`);
+M.two=m=>el(`<div class="mod rv"><h3>${m.title||'Pros and cons'}</h3><div class="two"><div class="col good"><h4>Good at</h4><ul>${m.plus.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col bad"><h4>Watch for</h4><ul>${m.minus.map(x=>`<li>${x}</li>`).join('')}</ul></div></div></div>`);
+M.quote=m=>el(`<div class="mod rv"><div class="quote">${m.text}${m.who?`<small>${m.who}</small>`:''}</div></div>`);
+M.prof=m=>el(`<div class="mod rv prof" style="--c:${col(m.k)};--cbg:${cbg(m.k)}">${av(m.k,m.mood||'happy')}<div><h3>${CO[m.k].n}: ${CO[m.k].tag}</h3><p style="margin:2px 0 10px;color:var(--muted)">${CO[m.k].line}</p><div class="traits">${m.traits.map(t=>`<span>${t}</span>`).join('')}</div></div></div>`);
+M.bars=m=>{
+  const mx=Math.max(...m.items.map(i=>i[1]));
+  const w=el(`<div class="mod rv"><h3>${m.title||'Compare'}</h3><div class="bars">${m.items.map(([l,n,k])=>`<div><div class="lb"><span>${l}</span><b>${n} ${m.unit||''}</b></div><div class="tr"><div class="fi" data-w="${(n/mx*100).toFixed(1)}" style="background:${col(k)}"></div></div></div>`).join('')}</div></div>`);
+  w._grow=()=>w.querySelectorAll('.fi').forEach(f=>f.style.width=f.dataset.w+'%');return w;
+};
+M.timeline=m=>el(`<div class="mod rv"><h3>${m.title||'Timeline'}</h3><div class="tl">${m.items.map(([y,t])=>`<div><b>${y}</b>${t}</div>`).join('')}</div></div>`);
+
+M.filters=()=>{
+  const out={R:"Friday. Fine. Done.",Y:"Friday? Great! Maybe we celebrate after!",G:"Friday... am I behind? Will someone be upset?",B:"Which Friday exactly? Which format and what standard?"};
+  const w=el(`<div class="mod rv"><h3>Play: what does each person hear?</h3><div class="listen pills"></div><div class="msgrow"><div class="msg">"Please finish this by Friday."</div><svg class="funnel" viewBox="0 0 56 56"><path d="M6 8 H50 L32 30 V48 H24 V30 Z" fill="var(--muted)"/></svg><div class="heard" style="--c:var(--N);--cbg:var(--Nbg)">Pick a listener</div></div><p class="hint">Same sentence. Four different messages. You can't control the filter, only how you say it.</p></div>`);
+  ['R','Y','G','B'].forEach(k=>{const b=el(`<button class="pill">${CO[k].n}</button>`);b.onclick=()=>{
+    w.querySelectorAll('.pill').forEach(p=>{p.classList.remove('on');p.style.background=''});b.classList.add('on');b.style.background=col(k);
+    const h=$('.heard',w);const n=h.cloneNode();n.style.cssText=`--c:${col(k)};--cbg:${cbg(k)}`;n.textContent='"'+out[k]+'"';h.replaceWith(n);};$('.listen',w).appendChild(b)});
+  return w;
+};
+
+M.onion=()=>{
+  const L=[
+    {n:"Core values",k:"B",d:"Learned as a child. Almost impossible to change. Example: all people are equal.",s:240,t:"Core"},
+    {n:"Attitudes",k:"G",d:"Opinions from your experiences. They can change. The author's relative thought most salespeople were crooks, so she returned every purchase.",s:170,t:"Attitude"},
+    {n:"The mask",k:"R",d:"What others see. You pick a mask for work, home and the in-laws. Behaviour = personality x surroundings.",s:100,t:"Mask"},
+  ];
+  const w=el(`<div class="mod rv"><h3>Tap a layer</h3><div class="onion"><div class="rings"></div><div class="rbox"><b>Inside out</b><p style="margin:6px 0 0">Tap a ring. The outer ring is the only one other people ever see.</p></div></div></div>`);
+  // order: outermost first so inner ones sit on top
+  const order=[L[0],L[1],L[2]].reverse().reverse();
+  [{...L[0],s:240},{...L[1],s:166},{...L[2],s:92}].forEach(r=>{
+    const lay=r.n==="Core values"?{...r,real:240}:r;
+  });
+  const rings=[["The mask","R",240,"What others see. You pick a mask for work, home and the in-laws. Behaviour = personality x surroundings."],["Attitudes","G",170,"Opinions from your experiences. They can change. The author's relative thought most salespeople were crooks, so she returned every purchase."],["Core values","B",100,"Learned as a child. Almost impossible to change. Example: all people are equal."]];
+  rings.forEach(([n,k,s,d])=>{
+    const b=el(`<button class="ring" style="width:${s}px;height:${s}px;left:${(240-s)/2}px;top:${(240-s)/2}px;background:${col(k)}" aria-label="${n}">${s===100?n:''}</button>`);
+    if(s!==100){b.style.alignItems='start';b.style.paddingTop='8px';b.textContent=n}
+    b.onclick=()=>{w.querySelectorAll('.ring').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');$('.rbox',w).innerHTML=`<b style="color:${col(k)}">${n}</b><p style="margin:6px 0 0">${d}</p>`};
+    $('.rings',w).appendChild(b);
+  });
+  return w;
+};
+
+M.matrix=()=>{
+  const info={Y:["Yellow","Fast and people-focused. Talks, jokes, connects."],R:["Red","Fast and task-focused. Decides, pushes, wins."],G:["Green","Reflective and people-focused. Listens, supports, keeps peace."],B:["Blue","Reflective and task-focused. Checks, plans, perfects."]};
+  const w=el(`<div class="mod rv"><h3>Drag the dot</h3><div class="mx"><div class="c" style="background:${cbg('Y')};color:${col('Y')}">Yellow</div><div class="c" style="background:${cbg('R')};color:${col('R')}">Red</div><div class="c" style="background:${cbg('G')};color:${col('G')}">Green</div><div class="c" style="background:${cbg('B')};color:${col('B')}">Blue</div>
+  <span class="ax" style="top:-20px;left:0;right:0;text-align:center">Fast, outgoing</span><span class="ax" style="bottom:-20px;left:0;right:0;text-align:center">Reflective, reserved</span><span class="ax" style="left:-30px;top:50%;transform:rotate(-90deg);transform-origin:left top;white-space:nowrap">People  &lt;  &gt;  Task</span><div class="dot" style="left:50%;top:50%">?</div></div><p class="hint" id="mxt">Two questions place anyone: are they about people or the task, and are they fast or reflective?</p></div>`);
+  const mx=$('.mx',w),dot=$('.dot',w);let drag=false;
+  const move=e=>{if(!drag)return;const r=mx.getBoundingClientRect();let x=Math.min(Math.max(e.clientX-r.left,0),r.width),y=Math.min(Math.max(e.clientY-r.top,0),r.height);dot.style.left=x+'px';dot.style.top=y+'px';
+    const k=y<r.height/2?(x<r.width/2?'Y':'R'):(x<r.width/2?'G':'B');dot.style.background=col(k);dot.textContent=info[k][0][0];$('#mxt',w).innerHTML=`<b style="color:${col(k)}">${info[k][0]}.</b> ${info[k][1]}`};
+  dot.addEventListener('pointerdown',e=>{drag=true;dot.setPointerCapture(e.pointerId)});
+  dot.addEventListener('pointermove',move);dot.addEventListener('pointerup',()=>drag=false);
+  return w;
+};
+
+M.garden=()=>{
+  const w=el(`<div class="mod rv"><h3>Play: the garden race</h3><div class="bars"><div><div class="lb"><span>Author's garden</span><b id="ga">20%</b></div><div class="tr"><div class="fi" id="gab" style="width:20%;background:var(--G)"></div></div></div><div><div class="lb"><span>Pelle's garden (Red)</span><b id="gp">0%</b></div><div class="tr"><div class="fi" id="gpb" style="width:0;background:var(--R)"></div></div></div></div><p class="hint" id="gt">Pelle never liked gardening. Then people praised the author's garden.</p><button class="nextbtn" id="gbtn">Author buys more plants</button></div>`);
+  let a=20,p=0;$('#gbtn',w).onclick=async()=>{
+    a=Math.min(a+8,100);$('#gab',w).style.width=a+'%';$('#ga',w).textContent=a+'%';$('#gt',w).textContent='Pelle sees the new plants and heads to the garden centre.';
+    await sleep(500);p=Math.min(p+Math.round((a-p)*0.9+10),100);$('#gpb',w).style.width=p+'%';$('#gp',w).textContent=p+'%';
+    if(p>=100)$('#gt',w).textContent='Pelle is in the lead. Nobody entered a contest, but he won it.';
+  };return w;
+};
+
+M.call=()=>{
+  const w=el(`<div class="mod rv"><h3>Play: the 8-second phone call</h3><div class="stopw" id="sw">0.0 s</div><div class="chat" id="cl" style="margin:10px 0"></div><button class="nextbtn" id="cb">Answer the call</button></div>`);
+  const lines=[[0.4,"Björn (Red)","R","Were you looking for me?"],[2.2,"New employee","N","No, I—"],[4,"Björn (Red)","R","Okay."]];
+  $('#cb',w).onclick=async()=>{
+    const b=$('#cb',w),cl=$('#cl',w);b.hidden=true;cl.innerHTML='';let t=0,li=0;
+    const iv=setInterval(()=>{t+=0.1;$('#sw',w).textContent=Math.min(t,8).toFixed(1)+' s';
+      while(li<lines.length&&t>=lines[li][0]){const [,who,k,tx]=lines[li];cl.appendChild(el(`<div class="bub">${av(k,k==='R'?'flat':'worry')}<div class="tx" style="background:${cbg(k)};border-color:${col(k)}"><b style="color:${col(k)}">${who}</b>${tx}</div></div>`));li++}
+      if(t>=8){clearInterval(iv);cl.appendChild(el(`<p class="hint">Call ended. His question was answered, so there was nothing left to say. He wasn't angry.</p>`));b.hidden=false;b.textContent='Replay'}},100);
+  };return w;
+};
+
+M.confident=()=>{
+  const w=el(`<div class="mod rv"><h3>Play: confidence beats facts</h3><p style="margin:0 0 10px">Elisabeth claims a company earns $50M a week. The news later says $2.5M. Fifteen consultants nodded. Change how she sounds:</p><div class="pills" id="vp"><button class="pill on" style="background:var(--R)">Sure of herself</button><button class="pill">Unsure</button></div><div class="crowd" id="cr"></div><p class="hint" id="ct"></p></div>`);
+  const cr=$('#cr',w);for(let i=0;i<15;i++)cr.appendChild(el('<i>·</i>'));
+  const set=sure=>{const kids=[...cr.children];kids.forEach((c,i)=>{const nod=sure||i<3;c.className=nod?'nod':'';c.textContent=nod?'✓':'?'});
+    $('#ct',w).textContent=sure?'15 of 15 nod. Nobody checks the number.':'Only 3 nod. The rest ask where the number came from.'};
+  const [b1,b2]=w.querySelectorAll('.pill');
+  b1.onclick=()=>{b1.classList.add('on');b1.style.background=col('R');b2.classList.remove('on');b2.style.background='';set(true)};
+  b2.onclick=()=>{b2.classList.add('on');b2.style.background=col('Y');b1.classList.remove('on');b1.style.background='';set(false)};
+  set(true);return w;
+};
+
+M.rain=()=>{
+  const w=el(`<div class="mod rv"><h3>Play: the rain test</h3><div class="sky" id="sky"><span class="cloud"></span><span class="sunny"></span><span class="rainbow"></span><span class="drops"></span><div class="who">${av('Y','happy')}</div><div class="say" hidden></div></div><button class="nextbtn" id="rb">Make it rain</button><p class="hint">The author tells his Yellow sister it will rain. She says the sun comes out after.</p></div>`);
+  $('#rb',w).onclick=async()=>{const s=$('#sky',w),say=$('.say',w),b=$('#rb',w);b.disabled=true;s.classList.remove('sun');s.classList.add('wet');say.hidden=false;say.textContent="I can't imagine that.";await sleep(1800);say.textContent="It's pouring, sure. But the sun comes out after!";await sleep(1800);s.classList.add('sun');s.classList.remove('wet');say.textContent="Told you!";await sleep(1500);b.disabled=false;b.textContent='Again'};
+  return w;
+};
+
+M.change=()=>{
+  const st=[["Announced today. Everyone agrees in the meeting.","worry","Says yes out loud. Worries in private. Resists quietly."],["One week notice","worry","Wants more detail and a safe way back."],["Two weeks, with the reason explained","flat","Asks questions. Starting to trust it."],["Three weeks and small steps","happy","Mostly comfortable. A few worries left."],["A month, small steps, private check-in","happy","On board. Even helps others."]];
+  const w=el(`<div class="mod rv"><h3>Play: how much notice does a Green need?</h3><input type="range" min="0" max="4" value="0" id="cr" aria-label="Notice given"><div class="face"><div id="fa">${av('G','worry')}</div><div><b id="fh"></b><p style="margin:2px 0 0" id="fp"></p></div></div></div>`);
+  const upd=()=>{const s=st[+$('#cr',w).value];$('#fa',w).innerHTML=av('G',s[1]);$('#fh',w).textContent=s[0];$('#fp',w).textContent=s[2]};
+  $('#cr',w).oninput=upd;upd();return w;
+};
+
+M.bluecheck=()=>{
+  const it=["Sources ready","Numbers double-checked","Questions answered in advance","No typos"];
+  const w=el(`<div class="mod rv"><h3>Play: win a Blue's trust</h3><div class="pills" id="ck"></div><div class="face"><div id="fa">${av('B','flat')}</div><div><b id="tr">Trust: 0%</b><div class="tr" style="height:14px;width:240px;background:var(--chip);border-radius:7px;margin-top:6px;overflow:hidden"><div id="tf" style="height:100%;width:0;background:var(--B);transition:width .4s"></div></div><p style="margin:6px 0 0" id="tt">Tick what you prepared.</p></div></div></div>`);
+  const on=new Set();
+  it.forEach((t,i)=>{const b=el(`<button class="pill">${t}</button>`);b.onclick=()=>{on.has(i)?on.delete(i):on.add(i);b.classList.toggle('on');b.style.background=b.classList.contains('on')?col('B'):'';
+    const p=on.size*25;$('#tr',w).textContent='Trust: '+p+'%';$('#tf',w).style.width=p+'%';$('#fa',w).innerHTML=av('B',p>=100?'happy':p>=50?'smirk':'flat');
+    $('#tt',w).textContent=p>=100?'Fully prepared. The Blue listens.':p>=50?'Getting there.':'Come back with more.'};$('#ck',w).appendChild(b)});
+  return w;
+};
+
+M.lean=()=>{
+  const fig=(k,label,cls)=>`<figure><svg width="150" height="180" viewBox="0 0 150 180"><line x1="15" y1="162" x2="135" y2="162" stroke="var(--line)" stroke-width="4"/><g class="body ${cls}"><circle cx="75" cy="36" r="17" fill="${col(k)}"/><path d="M75 54 V110 M75 68 L52 94 M75 68 L98 94 M75 110 L62 160 M75 110 L88 160" stroke="${col(k)}" stroke-width="9" stroke-linecap="round" fill="none"/></g></svg>${label}</figure>`;
+  const w=el(`<div class="mod rv"><h3>Play: what unsure looks like</h3><div class="lean">${fig('R','Red','r')}${fig('G','Green','g')}</div><div class="pills" style="justify-content:center"><button class="pill" id="u">Make them unsure</button></div><p class="hint" style="text-align:center">An unsure Red leans in and takes over. An unsure Green leans back.</p></div>`);
+  let un=false;$('#u',w).onclick=()=>{un=!un;$('.body.r',w).style.transform=un?'rotate(16deg)':'';$('.body.g',w).style.transform=un?'rotate(-16deg)':'';$('#u',w).textContent=un?'Calm them down':'Make them unsure'};
+  return w;
+};
+
+M.tabs=m=>{
+  const w=el(`<div class="mod rv"><h3>${m.title}</h3><div class="pills" id="tb"></div><div id="tp" style="margin-top:14px"></div></div>`);
+  const show=k=>{const d=m.data[k];w.querySelectorAll('.pill').forEach(p=>{const on=p.dataset.k===k;p.classList.toggle('on',on);p.style.background=on?col(k):''});
+    $('#tp',w).innerHTML=`<div class="two"><div class="col good"><h4>Do</h4><ul>${d.dos.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="col bad"><h4>Avoid</h4><ul>${d.donts.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`};
+  Object.keys(m.data).forEach(k=>{const b=el(`<button class="pill" data-k="${k}">${CO[k].n}</button>`);b.onclick=()=>show(k);$('#tb',w).appendChild(b)});
+  show(Object.keys(m.data)[0]);return w;
+};
+
+M.team=()=>{
+  const roles={Y:"Ideas",R:"Decisions",G:"Delivery",B:"Quality"};
+  const single={R:"Fast decisions, loud meetings, details slip.",Y:"Great energy and ideas. No plan, no finish.",G:"Calm and kind. Nobody decides.",B:"A perfect plan that never starts."};
+  const w=el(`<div class="mod rv"><h3>Play: build a team</h3><div class="pills" id="add"></div><div class="slots" id="sl"></div><div class="gauge" id="gg"></div><p><b id="tv"></b></p></div>`);
+  let team=[];
+  const draw=()=>{
+    $('#sl',w).innerHTML='';
+    for(let i=0;i<5;i++){const k=team[i];const b=el(`<button class="slot" aria-label="${k?'Remove '+CO[k].n:'Empty slot'}">${k?av(k):''}</button>`);if(k)b.onclick=()=>{team.splice(i,1);draw()};$('#sl',w).appendChild(b)}
+    $('#gg',w).innerHTML=['Y','R','G','B'].map(k=>{const n=team.filter(x=>x===k).length;const p=Math.min(n,2)*50;return `<div class="g"><span>${roles[k]}</span><div class="tr"><div class="fi" style="width:${p}%;background:${col(k)}"></div></div><span>${p}%</span></div>`}).join('');
+    const d=new Set(team);let t;
+    if(!team.length)t='Add up to five people. Tap one to remove.';else if(d.size===1)t=single[team[0]];else if(d.size===4)t='Balanced. Ideas, decisions, delivery and quality are all covered.';else t='Missing: '+['Y','R','G','B'].filter(k=>!d.has(k)).map(k=>roles[k].toLowerCase()).join(', ')+'.';
+    $('#tv',w).textContent=t;
+  };
+  ['R','Y','G','B'].forEach(k=>{const b=el(`<button class="pill on" style="background:${col(k)}">+ ${CO[k].n}</button>`);b.onclick=()=>{if(team.length<5){team.push(k);draw()}};$('#add',w).appendChild(b)});
+  team=['R','R','R'];draw();return w;
+};
+
+M.pour=()=>{
+  const gs=[{k:'R',n:'Red: shot glass',cap:3,w:46,h:70,nt:'Fills fast. Empties fast.'},{k:'Y',n:'Yellow: tumbler',cap:8,w:78,h:110,nt:'Warning signs, then guilt.'},{k:'G',n:'Green: barrel',cap:40,w:118,h:160,nt:'Rarely overflows. Turns inward.'}];
+  const w=el(`<div class="mod rv"><h3>Play: annoy them (a little)</h3><div class="pour"></div><div class="pills"><button class="pill on" style="background:var(--ink);color:var(--bg)" id="a1">Annoy</button><button class="pill" id="a5">Big annoyance (+5)</button><button class="pill" id="a0">Reset</button></div><p class="hint" id="pt">Each tap adds irritation to all three.</p></div>`);
+  const cnt=[0,0,0];
+  const cups=gs.map((g,i)=>{const e=el(`<div class="gl" style="--c:${col(g.k)}"><div class="boom">&nbsp;</div><div class="cup" style="width:${g.w}px;height:${g.h}px"><div class="liq"></div></div><div class="lab" style="color:${col(g.k)}">${g.n}</div><div class="nt">${g.nt}</div></div>`);$('.pour',w).appendChild(e);return e});
+  const upd=n=>{gs.forEach((g,i)=>{cnt[i]+=n;const c=cups[i],liq=$('.liq',c);
+    if(cnt[i]>=g.cap){liq.style.height='100%';c.classList.add('spill');$('.boom',c).textContent=g.k==='R'?'Outburst! Then over it.':g.k==='Y'?'Outburst, then sorry.':'Finally.';
+      setTimeout(()=>{cnt[i]=0;liq.style.height='0';c.classList.remove('spill');$('.boom',c).innerHTML='&nbsp;'},1300)}
+    else{liq.style.height=(cnt[i]/g.cap*100)+'%';if(g.k==='Y'&&cnt[i]/g.cap>.7)$('.boom',c).textContent='Voice rising...';}
+  })};
+  $('#a1',w).onclick=()=>upd(1);$('#a5',w).onclick=()=>upd(5);
+  $('#a0',w).onclick=()=>{cnt.fill(0);cups.forEach(c=>{$('.liq',c).style.height='0';$('.boom',c).innerHTML='&nbsp;'})};
+  return w;
+};
+
+M.battery=()=>{
+  const th=["Authority taken away","No results","No challenge","Wasted time","Routine work","Stupid mistakes by others","Told to calm down"];
+  const w=el(`<div class="mod rv"><h3>Play: drain a Red's battery</h3><div class="battery"><i style="width:100%"></i></div><div class="pills" style="margin-top:12px" id="th"></div><p class="hint" id="bt">Tap what stresses a Red. Under stress they blame everyone else.</p></div>`);
+  let lvl=100;const f=$('.battery i',w);
+  th.forEach(t=>{const b=el(`<button class="pill">${t}</button>`);b.onclick=()=>{if(b.disabled)return;b.disabled=true;b.style.opacity=.4;lvl=Math.max(lvl-15,0);f.style.width=lvl+'%';
+    $('#bt',w).textContent=lvl<=10?'Empty. "Why is everyone around me so useless?"':lvl<50?'Running low. Short answers, sharp tone.':'Draining.'};$('#th',w).appendChild(b)});
+  const r=el(`<button class="ghost" style="margin-top:12px">Recharge</button>`);r.onclick=()=>{lvl=100;f.style.width='100%';w.querySelectorAll('.pill').forEach(p=>{p.disabled=false;p.style.opacity=1});$('#bt',w).textContent='Recharged.'};w.appendChild(r);
+  return w;
+};
+
+M.race=()=>{
+  const L=[{k:'R',to:'calc(100% - 64px)',dur:'2.2s',ease:'cubic-bezier(.2,.9,.3,1)',tag:'30 min',vd:'Finished first. Solved the wrong problem.',t:2600},{k:'Y',to:'62%',dur:'4s',ease:'ease-in-out',tag:'late',vd:'Fun talk. Task not solved.',t:4200},{k:'G',to:'42%',dur:'5s',ease:'linear',tag:'unsure',vd:'"Mostly agree" while four looked unhappy.',t:5200},{k:'B',to:'24%',dur:'6s',ease:'linear',tag:'still checking',vd:'Debating "advisor" vs "adviser".',t:6200}];
+  const w=el(`<div class="mod rv"><h3>Play: four same-colour teams, one task</h3><div class="lanes">${L.map(l=>`<div class="lane" style="--cbg:${cbg(l.k)};--c:${col(l.k)}"><div class="fin"></div><span class="tg">${CO[l.k].n}</span><div class="run" style="--dur:${l.dur};--ease-r:${l.ease}">${av(l.k)}</div><div class="vd"></div></div>`).join('')}</div><button class="nextbtn" id="go">Run the experiment</button></div>`);
+  $('#go',w).onclick=()=>{const b=$('#go',w);b.disabled=true;
+    w.querySelectorAll('.lane').forEach(n=>{$('.run',n).style.left='6px';$('.vd',n).classList.remove('on')});
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      w.querySelectorAll('.lane').forEach((n,i)=>{$('.run',n).style.left=L[i].to;setTimeout(()=>{const v=$('.vd',n);v.textContent=L[i].vd;v.classList.add('on')},L[i].t)});
+      setTimeout(()=>{b.disabled=false;b.textContent='Run it again'},6800);
+    }));};
+  return w;
+};
+
+M.cheat=()=>el(`<div class="cheat">${['R','Y','G','B'].map(k=>`<div class="cc rv" style="--c:${col(k)};--cbg:${cbg(k)}">${av(k)}<h3>${CO[k].n}</h3><dl><dt>Spot them</dt><dd>${CO[k].spot}</dd><dt>Say it like this</dt><dd>${CO[k].say}</dd><dt>Avoid</dt><dd>${CO[k].avoid}</dd><dt>Their trap</dt><dd>${CO[k].trap}</dd></dl></div>`).join('')}</div>`);
+
+/* ---------------- chapter data ---------------- */
+const rate=[["R","Red"],["Y","Yellow"],["G","Green"],["B","Blue"]];
+const CH=[
+{n:"0",t:"The man who was surrounded by idiots",k:"N",mods:[
+ {m:"big",text:"If everyone around you seems like an idiot, maybe you don't speak their language."},
+ {m:"chat",title:"Story: Sture",lines:[["Sture, business owner","N","I'm surrounded by idiots.","mad"],["Young interviewer","B","Then who's the common factor?","smirk"],["Sture, business owner","N","*throws him out*","shock"]]},
+ {m:"flow",title:"How an idiot gets made",steps:["Meet someone different","Don't understand them","Call them an idiot","Miss what they're good at"]},
+ {m:"flip",title:"The four colours (tap each)",cards:[{k:"R",front:"Red",back:"Dominance. Fast, blunt, wants to win."},{k:"Y",front:"Yellow",back:"Inducement. Talkative, upbeat, big picture."},{k:"G",front:"Green",back:"Submission. Calm, loyal, hates sudden change."},{k:"B",front:"Blue",back:"Analytic. Exact, careful, wants facts."}]}]},
+{n:"1",t:"Communication happens on the listener's terms",k:"N",mods:[
+ {m:"big",text:"People hear what they hear, not what you said."},
+ {m:"filters"},
+ {m:"flip",title:"Behaviour is a toolbox",cards:[{k:"R",front:"Sledgehammer",back:"Great for tearing down a wall. Terrible for hanging a picture."},{k:"B",front:"Picture hook",back:"Perfect for the frame. Useless on a wall."}]},
+ {m:"mcq",qs:[{q:"A teammate keeps misunderstanding you. Best move?",o:["Say it louder","Change how you say it","Give up on them"],a:1,fb:"You can't change how they listen. You can change how you speak."},{q:"Which rule works better?",o:["Treat others how YOU want to be treated","Treat others how THEY want to be treated"],a:1,fb:"The golden rule only works if everyone is like you."}]}]},
+{n:"2",t:"Why are we the way we are?",k:"N",mods:[
+ {m:"big",text:"Your behaviour is built in layers. Others only see the top one."},
+ {m:"onion"},
+ {m:"quote",text:"Behaviour = Personality × Surroundings",who:"You can watch behaviour. Personality you can only guess."},
+ {m:"mcq",qs:[{q:"A relative returns everything she buys because she distrusts salespeople. That is a...",o:["Core value","Attitude","Mask"],a:1,fb:"Attitudes come from experience, so better experiences can change them."}]}]},
+{n:"3",t:"An introduction to the system",k:"N",mods:[
+ {m:"big",text:"Four colours. Two questions. That's the whole map."},
+ {m:"matrix"},
+ {m:"bars",title:"How many colours is a person?",unit:"%",items:[["Two colours dominant",80,"G"],["Three colours dominant",15,"B"],["One colour only",5,"R"]]},
+ {m:"quote",text:"Green is the most common. Pure Red is the rarest."}]},
+{n:"4",t:"Red behaviour",k:"R",mods:[
+ {m:"big",text:"Reds want to win. And they want it now."},
+ {m:"prof",k:"R",mood:"mad",traits:["Decisive","Blunt","Competitive","Impatient","Fearless"]},
+ {m:"garden"},{m:"call"},{m:"confident"},
+ {m:"two",plus:["Gets things done","Takes risks","Changes course fast"],minus:["Overrides people","Bored by the status quo","Skips details"]},
+ {m:"mcq",title:"Scenario",qs:[{q:"You need a Red boss to approve a vendor. What do you send?",o:["\"Hi! How was your weekend? Anyway, I have thoughts...\"","\"Decision needed: approve vendor. Two options, I recommend A. Yes or no?\"","\"Let me walk you through everything from the start.\""],a:1,fb:"Main point first. Short. Ask for the decision."}]}]},
+{n:"5",t:"Yellow behaviour",k:"Y",mods:[
+ {m:"big",text:"Yellows bring the fun. Details are someone else's job."},
+ {m:"prof",k:"Y",traits:["Enthusiastic","Social","Curious","Persuasive","Spontaneous"]},
+ {m:"rain"},
+ {m:"chat",title:"Story: Micke's car",lines:[["Author","N","You hit a lamppost! Are you okay?!","shock"],["Micke (Yellow)","Y","It was fine! I just got out the other door!","happy"]]},
+ {m:"flow",title:"Story: Marianne and the angry customer",accent:"Y",steps:["Angry customer","Marianne just smiles","Anger softens","They laugh"]},
+ {m:"two",plus:["Lifts a room","Fresh ideas","Forgives fast"],minus:["Loses focus","Late, disorganised","Talks over people"]},
+ {m:"mcq",title:"Scenario",qs:[{q:"You must make sure a Yellow catches a flight at 8 PM. What do you do?",o:["Mention it once in passing","Sync watches. Say plainly: the plane leaves at 8, be there by then","Trust them"],a:1,fb:"Yellows need clear, explicit appointments."}]}]},
+{n:"6",t:"Green behaviour",k:"G",mods:[
+ {m:"big",text:"Greens keep the peace. Change is what they dread."},
+ {m:"prof",k:"G",traits:["Calm","Loyal","Patient","Great listener","Team player"]},
+ {m:"chat",title:"Story: the Yellow husband",lines:[["Husband (Yellow)","Y","*juggling, jokes, centre stage*","happy"],["Author","N","Doesn't he ever tire you out?","flat"],["Wife (Green)","G","But he's having so much fun.","happy"]]},
+ {m:"change"},
+ {m:"steps",title:"How to bring a Green along",accent:"G",items:["Explain the reason","Break it into small steps","Allow weeks, not days","Check in privately"]},
+ {m:"mcq",title:"Scenario",qs:[{q:"New software starts next month. How do you tell a Green teammate?",o:["\"Starting Monday we switch. Deal with it.\"","\"Here's why, here are three small steps, and we'll go slowly. What worries you?\"","Announce it in front of the whole team"],a:1,fb:"Reason, small steps, time, and a private chat."}]}]},
+{n:"7",t:"Blue behaviour",k:"B",mods:[
+ {m:"big",text:"Blues check everything twice. Then once more."},
+ {m:"prof",k:"B",mood:"flat",traits:["Precise","Cautious","Organised","Factual","Reserved"]},
+ {m:"chat",title:"Story: the dinner fact-check",lines:[["Red","R","They've been to the Super Bowl eleven times!","mad"],["Yellow","Y","I grew up on Will Smith's block!","happy"],["Blue","B","Actually, ten times. And his old neighbourhood is half an hour north.","flat"]]},
+ {m:"chat",title:"Story: the quiet expert",lines:[["Group","N","*two hours stuck on a problem*","worry"],["Blue","B","The answer is this.","flat"],["Author","N","Why didn't you say so earlier?","shock"],["Blue","B","You never asked.","flat"]]},
+ {m:"bluecheck"},
+ {m:"two",plus:["Accuracy","Quality control","Follows through"],minus:["Slow to decide","Sees risks everywhere","Cold, critical tone"]}]},
+{n:"8",t:"No one is completely perfect",k:"N",mods:[
+ {m:"big",text:"Every strength comes with a shadow."},
+ {m:"flip",title:"Tap for the shadow side",cards:[{k:"R",front:"Decisive",back:"...and overrides everyone."},{k:"Y",front:"Inspiring",back:"...and forgets the details."},{k:"G",front:"Supportive",back:"...and avoids conflict."},{k:"B",front:"Precise",back:"...and takes forever."}]},
+ {m:"quote",text:"Just because I'm right doesn't make you wrong."}]},
+{n:"9",t:"Learning new things",k:"N",mods:[
+ {m:"big",text:"Reading isn't enough. This is a language. You have to speak it."},
+ {m:"flow",title:"The ladder",steps:["Read","Understand","Practise on real people","Fluent"]},
+ {m:"mcq",title:"Practice: spot the colour (examples by me, not from the book)",qs:[
+  {q:"\"Skip the intro. What's the decision?\"",o:["Red","Yellow","Green","Blue"],a:0,fb:"Fast and direct. Red."},
+  {q:"\"You HAVE to hear what happened last night!\"",o:["Red","Yellow","Green","Blue"],a:1,fb:"Story first, point later. Yellow."},
+  {q:"\"Whatever works for everyone is fine with me.\"",o:["Red","Yellow","Green","Blue"],a:2,fb:"Keeps the peace. Green."},
+  {q:"\"Before we decide, can I see the source?\"",o:["Red","Yellow","Green","Blue"],a:3,fb:"Wants the facts. Blue."},
+  {q:"\"Why is this meeting still going? We've talked for twenty minutes.\"",o:["Red","Yellow","Green","Blue"],a:0,fb:"Impatient with slow. Red."},
+  {q:"\"Don't worry, it'll all work out. Coffee?\"",o:["Red","Yellow","Green","Blue"],a:1,fb:"Sunny and unconcerned. Yellow."}]}]},
+{n:"10",t:"Body language",k:"N",mods:[
+ {m:"big",text:"You say a lot before you open your mouth."},
+ {m:"bars",title:"Signals in the language",unit:"k",items:[["Body-language signals (one estimate)",700,"B"],["English words",170,"N"]]},
+ {m:"lean"},
+ {m:"flip",title:"Red body language (tap)",cards:[{k:"R",front:"Handshake",back:"Hard. To show who's in charge."},{k:"R",front:"Eyes",back:"Direct. Fixed on you."},{k:"R",front:"Pointing",back:"Palm down. Controlling."},{k:"R",front:"Walking",back:"Brisk. Expects you to move aside."}]}]},
+{n:"11",t:"The company party",k:"N",mods:[
+ {m:"big",text:"One office party shows all four colours at work."},
+ {m:"chat",title:"Story: the party decision",lines:[["Yellow advisor","Y","We need a party! A spa weekend, games, a monster dinner!","happy"],["Red director","R","Decided. I'll pay. You organise it.","flat"],["Greens","G","Um... sure.","worry"],["Yellow advisor","Y","Black tie! No, a toga party!!","happy"],["Blue credit manager","B","But how are we supposed to get there?","flat"]]},
+ {m:"flow",title:"Who did what",steps:["Yellow: idea","Red: decides in 5 minutes","Greens: say yes","Blue: spots the problem"],accent:"R"},
+ {m:"mcq",qs:[{q:"Who asked the practical question nobody else thought of?",o:["Red director","Yellow advisor","Green colleagues","Blue credit manager"],a:3,fb:"Blues see risks and missing details first."}]}]},
+{n:"12",t:"Adaptation",k:"N",mods:[
+ {m:"big",text:"Adapt a little. Be understood a lot."},
+ {m:"tabs",title:"Dos and don'ts (tap a colour)",data:{R:{dos:["Be quick and direct","Lead with the point","Stay on topic","Hold your ground"],donts:["Small talk","Long preambles","Wandering off-topic"]},Y:{dos:["Warm, open body language","Big picture first","Confirm times clearly","Friendly setting for feedback"],donts:["Heavy detail","Cold, formal tone"]},G:{dos:["Be patient","Explain every step","Criticise in private","Ask for their view, then wait"],donts:["Sudden change","Public pressure"]},B:{dos:["Be well prepared","Bring facts","Use checklists","Double-check your work"],donts:["Vague visions","Careless mistakes"]}}},
+ {m:"mcq",title:"Pick the best approach",qs:[
+  {q:"Pitching to a Red.",o:["Start from the history of the problem","Lead with your recommendation and ask for a yes or no","Chat first to warm them up"],a:1,fb:"Cut the small talk."},
+  {q:"Pitching to a Yellow.",o:["Send a 12-page spec","Open with the big idea, friendly and excited","A cold one-line email"],a:1,fb:"Big picture and warmth."},
+  {q:"Proposing a change to a Green.",o:["Announce in front of everyone","Private chat, small steps, time to think","Give a deadline of tomorrow"],a:1,fb:"Private, patient, and in small pieces."},
+  {q:"Presenting to a Blue.",o:["Trust me, it'll be fine","Data, sources and a checklist ready","Big vision, details later"],a:1,fb:"Show your homework."}]}]},
+{n:"13",t:"How to deliver really bad news",k:"N",mods:[
+ {m:"big",text:"The same feedback lands differently on each colour."},
+ {m:"chat",title:"Story: the public thank-you",lines:[["Author (boss)","N","Micke, you're our star! Take the afternoon off, dinner and a movie are on me!","happy"],["Micke (Green)","G","...","shock"],["Micke, after","G","How could you do that to me in front of 27 people? I was just doing my job.","mad"]]},
+ {m:"mcq",title:"Match the feedback style",qs:[
+  {q:"Hard feedback for a Red.",o:["Straight and short","In private, with lots of time","Warm and persistent","Specific, calm, with facts"],a:0,fb:"Reds can take it plain."},
+  {q:"Hard feedback for a Yellow.",o:["Straight and short","In private, with lots of time","Warm setting, and be persistent","Specific, calm, with facts"],a:2,fb:"Friendly atmosphere, and say it more than once."},
+  {q:"Hard feedback for a Green.",o:["Straight and short","In private, with time to respond","Warm and persistent","Specific, calm, with facts"],a:1,fb:"Never in public."},
+  {q:"Hard feedback for a Blue.",o:["Straight and short","In private, with lots of time","Warm and persistent","Specific, calm, with facts"],a:3,fb:"Calm, factual and specific."}]}]},
+{n:"14",t:"Who gets along and why it works",k:"N",mods:[
+ {m:"big",text:"The best team has all four colours."},
+ {m:"team"},
+ {m:"flow",title:"Team roles",steps:["Yellow: ideas","Red: decisions","Green: steady delivery","Blue: quality check"]},
+ {m:"mcq",qs:[{q:"In the car comparison, Red is the accelerator. Blue is...",o:["The steering wheel","The brake","The radio"],a:1,fb:"Both are needed. Just don't press both pedals at once."},{q:"Which pair has the same tempo?",o:["Red + Green","Blue + Green","Yellow + Blue"],a:1,fb:"Blue and Green are both reflective and calm. Red and Yellow are both fast."}]}]},
+{n:"15",t:"Written communication",k:"N",mods:[
+ {m:"big",text:"Your colour shows in your emails."},
+ {m:"mcq",title:"Decode the email (the first two are from the book; the last two are my examples)",qs:[
+  {mail:"Subject: Meeting\nMeeting tomorrow morning at 11. BE PUNCTUAL! -K",q:"Who wrote it?",o:["Red","Yellow","Green","Blue"],a:0,fb:"Short, no greeting, caps. Reply fast with: Okay."},
+  {mail:"Subject: Meeting\nHello! Were you at the game last night? Lasse spilled his drink everywhere. Check the photo! By the way, can we chat about the customer tomorrow around eleven? Ciao! Krille",q:"Who wrote it?",o:["Red","Yellow","Green","Blue"],a:1,fb:"Chat, story, photo, and the point almost last."},
+  {mail:"Subject: Tomorrow\nHi! Hope you're doing okay. No rush at all, but whenever it suits you, could we maybe look at this together? Totally fine if not.",q:"Who wrote it?",o:["Red","Yellow","Green","Blue"],a:2,fb:"Soft, careful, no pressure. Green."},
+  {mail:"Subject: Agenda v2 (corrected)\nAttached: agenda v2. Changes: item 3 reworded; typo fixed on slide 4. Source for figures: Q3 report, p. 12.",q:"Who wrote it?",o:["Red","Yellow","Green","Blue"],a:3,fb:"Exact, itemised, with sources. Blue."}]}]},
+{n:"16",t:"What makes us mad as hell?",k:"N",mods:[
+ {m:"big",text:"How you get angry shows your colour."},
+ {m:"pour"},
+ {m:"mcq",qs:[{q:"A Green has been calm for months, then blows up. Why?",o:["They were faking","The barrel finally filled up","They changed colour"],a:1,fb:"Beware the fury of a patient person."},{q:"Which colour feels guilty afterwards and forgets quickly?",o:["Red","Yellow","Green","Blue"],a:1,fb:"Yellow: tumbler. You can see it filling, and they say sorry."}]}]},
+{n:"17",t:"Stress factors and energy thieves",k:"N",mods:[
+ {m:"big",text:"Stress is demands bigger than your capacity. Each colour leaks energy differently."},
+ {m:"battery"},
+ {m:"quote",text:"Learn your own energy thieves, and other people's."}]},
+{n:"18",t:"A short reflection through history",k:"N",mods:[
+ {m:"big",text:"People have always sorted people. This model is old."},
+ {m:"timeline",items:[["About 400 BC","Hippocrates describes four temperaments."],["1928","Marston writes Emotions of Normal People."],["1984","TTI Success Insights is founded in Iowa."],["Today","More than 50 million assessments."]]},
+ {m:"flip",title:"Hippocrates' temperaments (tap)",cards:[{k:"R",front:"Choleric",back:"Red: fiery, hot-blooded."},{k:"Y",front:"Sanguine",back:"Yellow: cheerful optimist."},{k:"G",front:"Phlegmatic",back:"Green: calm, easygoing."},{k:"B",front:"Melancholic",back:"Blue: reserved, analytic."}]}]},
+{n:"19",t:"Voices from real life",k:"N",mods:[
+ {m:"big",text:"Real people, different colours, same book. Listen to how they answer."},
+ {m:"quote",text:"I don't like repetition. But sure, it's a useful tool.",who:"Helena, a mostly Red CEO, on the book"},
+ {m:"flip",title:"How each colour tends to answer (illustrative)",cards:[{k:"R",front:"Red",back:"Short. Gets to the point."},{k:"Y",front:"Yellow",back:"Long, with stories."},{k:"G",front:"Green",back:"Careful. Thinks of others first."},{k:"B",front:"Blue",back:"Exact, with qualifiers."}]}]},
+{n:"20",t:"A quick little quiz",k:"N",mods:[
+ {m:"big",text:"Test yourself. These are the author's own answers."},
+ {m:"mcq",title:"Quiz",qs:[
+  {q:"Which colours naturally agree on a social level?",o:["Two Yellows","Red and Blue","Green and Red"],a:0,fb:"Book answer: two Yellows."},
+  {q:"Who always prefers to head a project?",o:["Red","Yellow","Green","Blue"],a:0,fb:"Red."},
+  {q:"Who would make the best surgeon?",o:["Red","Yellow","Green","Blue"],a:3,fb:"Blue."},
+  {q:"Who would enjoy giving a speech most?",o:["Red","Yellow","Green","Blue"],a:1,fb:"Yellow."},
+  {q:"Who wants more tests or info before deciding?",o:["Red","Yellow","Green","Blue"],a:3,fb:"Blue."},
+  {q:"Who is always on time?",o:["Red","Yellow","Green","Blue"],a:3,fb:"Blue."},
+  {q:"Who doesn't follow the rulebook to get the job done?",o:["Red","Yellow","Green","Blue"],a:0,fb:"Red."},
+  {q:"Who remembers personal criticism the longest?",o:["Red","Yellow","Green","Blue"],a:2,fb:"Green."}]}]},
+{n:"21",t:"The most enlightening team project",k:"N",mods:[
+ {m:"big",text:"Teams of one colour all fail, just in different ways."},
+ {m:"race"},
+ {m:"quote",text:"No group should be made of one type. Mix the colours.",who:"The author's conclusion"},
+ {m:"mcq",qs:[{q:"The author put 20 managers into same-colour groups. What did he conclude?",o:["Same colour teams work best","Diverse teams work best","Blue teams win"],a:1,fb:"Managers often hire people like themselves. That's the mistake."}]}]},
+];
+/* Guide voice: [lesson intro, "use it tomorrow"] per chapter, and a one-line lead before the games. */
+const TALK={
+0:["Let's start with a man who thought everyone else was the problem. He was missing one skill, and it's the skill this whole book teaches.","Next time someone drives you mad, ask \"what colour might they be?\" instead of \"what's wrong with them?\""],
+1:["You say something clear. Your friend hears something else. They're not slow, and you're not unclear. That's just how listening works.","Don't try to fix the listener. Change how you deliver it, and say it in the way they best understand."],
+2:["Why are you the way you are? Part genes, part how you grew up. Think of an onion with three layers.","You act differently at work, at home and with in-laws. That's normal. People only ever see your outer layer."],
+3:["Here's the entire system in two minutes. Every person sits somewhere on a map. Two questions place them.","Most people are a mix of two colours. Treat colours as ingredients, not boxes."],
+4:["Meet Red. You know one: the person who answered before you finished asking.","With a Red, be short, be direct, and have your point ready. Their bluntness is speed, not an attack."],
+5:["Now Yellow. This is the person everyone drifts towards at a party, the one telling the story.","With a Yellow, stay warm, keep it big-picture, and put the time in writing. They'll love you for it."],
+6:["Green is the most common colour and the easiest to overlook. Quiet, kind, and very good at keeping a group together.","With a Green, ask what they think, then actually wait. Their silence in a meeting is not agreement."],
+7:["Blue is the one who quietly notices the typo on slide four. They don't say much. They know a lot.","With a Blue, prepare. Bring facts and sources. Never guess out loud."],
+8:["Every colour has a brilliant side and a side that makes everyone else crazy. Same trait, two faces.","When someone annoys you, check: is this their shadow side? And remember you have one too."],
+9:["Reading this won't make you good at spotting colours. Practice will. It's like learning Spanish: you only get fluent by speaking.","Guess people's colours in real life this week. Wrong guesses are fine. That's how you learn."],
+10:["Before anyone says a word, their body is already talking. Here's what to look for.","Treat body language as a hint, never proof. Nerves and culture change everything."],
+11:["Let's watch all four colours in one place. One office. One idea for a party. Four very different reactions.","Same event, four reactions. None is wrong. Each one notices something the others miss."],
+12:["This is the skill the whole book builds to: changing how you speak depending on who's listening.","Adapting isn't being fake. It's making it easier for the other person to hear you."],
+13:["Giving criticism or bad news. Do it right and people thank you. Do it wrong and they remember for years.","Choose public or private, blunt or gentle, based on the person's colour, not yours."],
+14:["Why do some teams click and others clash? Mostly because of the mix of colours.","Build teams for difference, not for similarity. Hiring clones of yourself feels easy and fails."],
+15:["Can't meet in person? Read their emails like clues. Everyone writes in their own colour.","Mirror their style. Short for Red, chatty for Yellow, gentle for Green, precise for Blue."],
+16:["What makes each colour lose it, and how it looks when they do? The author uses glasses of different sizes.","A Red's blow-up is quick and forgotten. A Green's calm is not the same as \"no problem\". Watch the level."],
+17:["Stress hits each colour in a different spot. Learn yours, and learn the people around you.","Name your own energy drains and plan your week around them."],
+18:["This isn't a new fad. People have been sorting personalities for about 2,400 years.","The model is old wisdom plus modern testing. You can trust the pattern, but not use it to label people."],
+19:["What do real people say after reading this? The author asked four readers with different profiles.","Everyone uses it differently. Helena, a Red, uses it to stop beating around the bush."],
+20:["Quiz time. Nobody's grading.","If you missed some, go back to that colour's lesson and play it again."],
+21:["Finale. An experiment that ties everything together. Same-colour teams, same task.","The big lesson: a mix of colours beats a team of people who all think alike."],
+};
+const LEAD={
+filters:"Try this. Pick a person and see what they'd hear from the exact same sentence.",
+onion:"Let's peel you like an onion. Tap each ring from the outside in.",
+matrix:"Two questions place anyone on the map. Drag the dot around and watch the colour change.",
+garden:"A story about competition. Tap the button and watch what happens next door.",
+call:"Reds don't waste words. Here's a real call that lasted eight seconds. Answer it.",
+confident:"Reds sound sure even when they're wrong. See how that changes a room.",
+rain:"Yellows find the sunshine in everything. Try to make them gloomy.",
+change:"Greens don't like surprises. Slide to give them more notice and watch the face.",
+bluecheck:"A Blue won't trust you until you've done your homework. Tick what you prepared.",
+lean:"Under pressure, colours lean different ways. Tap the button.",
+team:"You're picking a team of five. Add colours and see what's missing.",
+pour:"Each colour holds anger differently. Tap Annoy and watch the glasses.",
+battery:"A Red's energy drains fast on certain things. Tap them one by one.",
+race:"Same task, four teams of one colour each. Press play and see who gets it right."
+};
+const STARTCOLORS={N:"N"};
+
+/* ---------------- finder quiz ---------------- */
+const FQ=[
+ ["At a party you usually...",["Take charge of what happens next","Tell stories to a crowd","Sit with one or two people and listen","Notice what's off and quietly fix it"]],
+ ["Plans change at the last minute. You think...",["Fine. Decide fast.","Fun! New plan!","Ugh, can we keep the old one?","What exactly changed, and why?"]],
+ ["In a group project you naturally...",["Lead","Pitch ideas","Keep everyone happy","Check the quality"]],
+ ["To make a big decision you...",["Go with it now","Follow your gut","Ask people you trust","Research until you're sure"]],
+ ["When stressed you...",["Snap at people","Talk it out with anyone","Go quiet","Pull back and analyse"]],
+ ["Friends would call you...",["Driven","Fun","Dependable","Precise"]],
+ ["Ideal Saturday?",["Win something","A big gathering","Home with family","Finish a project properly"]],
+ ["Best way to give you feedback?",["Straight, no padding","Friendly, with a laugh","Privately, with time","With specific facts"]],
+];
+function buildFinder(){
+  const s=$('#finder');s.innerHTML=`<div class="lesson"><div class="eyebrow">Start here</div><h2>Find your colour</h2><p class="intro">Eight quick questions. Pick what feels most like you, not what you wish was true.</p><div class="mod" id="fq"></div></div>`;
+  const box=$('#fq');let i=0;const sc={R:0,Y:0,G:0,B:0};
+  const ks=['R','Y','G','B'];
+  const q=()=>{
+    if(i>=FQ.length){
+      const sorted=ks.slice().sort((a,b)=>sc[b]-sc[a]);const t=sorted[0],t2=sorted[1];
+      box.innerHTML=`<p class="q">You're mostly ${CO[t].n}${sc[t2]>=sc[t]-1?` with a lot of ${CO[t2].n}`:''}.</p><div class="bars" id="fr"></div><div class="face" style="margin-top:16px">${av(t)}<div><b style="color:${col(t)}">${CO[t].n}: ${CO[t].line}</b><p style="margin:4px 0">Others should: ${CO[t].say.toLowerCase()}</p><p style="margin:4px 0"><b>Your trap:</b> ${CO[t].trap}</p></div></div><button class="ghost" style="margin-top:14px">Retake</button>`;
+      $('#fr',box).innerHTML=ks.map(k=>`<div><div class="lb"><span>${CO[k].n}</span><b>${sc[k]}/8</b></div><div class="tr"><div class="fi" style="width:0;background:${col(k)}" data-w="${sc[k]/8*100}"></div></div></div>`).join('');
+      setTimeout(()=>box.querySelectorAll('.fi').forEach(f=>f.style.width=f.dataset.w+'%'),50);
+      $('.ghost',box).onclick=()=>{i=0;ks.forEach(k=>sc[k]=0);q()};
+      store.set('sbi-me',t);return;}
+    const [qq,os]=FQ[i];
+    box.innerHTML=`<div class="mq"><div class="meta" style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-bottom:8px"><span>Question ${i+1} of ${FQ.length}</span></div><p class="q">${qq}</p><div class="opts">${os.map((o,j)=>`<button class="opt" data-k="${ks[j]}">${o}</button>`).join('')}</div></div>`;
+    box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{sc[b.dataset.k]++;i++;q()});
+  };q();
+}
+
+/* ---------------- render ---------------- */
+function build(){
+  const done=new Set(store.get('sbi-done',[]));
+    const MEET={R:["The Driver","Wants to decide and get going. Hates waiting.","Book it. Now."],Y:["The Spark","Wants fun, people and new ideas. Hates boring.","This will be amazing!"],G:["The Glue","Wants everyone comfortable and happy. Hates conflict.","Whatever works for everyone is fine."],B:["The Checker","Wants facts and a plan. Hates mistakes.","Has anyone read the reviews?"]};
+  const cast=$('#cast');
+  ['R','Y','G','B'].forEach(k=>cast.appendChild(el(`<div class="mc" style="--c:${col(k)};--cbg:${cbg(k)}">${av(k,k==='R'?'mad':'happy')}<h3>${CO[k].n}</h3><p class="role">${MEET[k][0]}</p><p style="margin:0">${MEET[k][1]}</p><div class="says"><small>At the trip meeting they say</small>"${MEET[k][2]}"</div></div>`)));
+  buildFinder();
+  const L=$('#lessons'),D=$('#drawer');
+  D.innerHTML=CH.map((c,i)=>`<a href="#ch${i}"><span class="dn" style="background:${col(c.k)}">${c.n}</span>${c.t}<span class="ck" data-ck="${i}"></span></a>`).join('');
+  CH.forEach((c,i)=>{
+    const sec=el(`<section class="lesson" id="ch${i}" style="--c:${col(c.k==='N'?'B':c.k)};--cbg:${cbg(c.k==='N'?'B':c.k)}"><div class="eyebrow">${i?'Chapter '+c.n:'Introduction'}</div><h2>${c.t}</h2></section>`);
+    const T=TALK[i];
+    if(T)sec.appendChild(el(`<p class="intro rv">${T[0]}</p>`));
+    c.mods.forEach(m=>{const f=M[m.m];if(!f)return;const node=f(m,c);const ld=m.lead||LEAD[m.m];
+      if(ld&&m.m!=='big'){const p=el(`<p class="sub">${ld}</p>`);const h=$('h3',node);h?h.after(p):node.prepend(p)}
+      sec.appendChild(node)});
+    if(T)sec.appendChild(el(`<div class="sowhat rv"><b>Try this tomorrow</b>${T[1]}</div>`));
+    const row=el(`<div class="done-row"><button class="donebtn">Mark as done</button></div>`);const b=$('.donebtn',row);
+    const mark=()=>{b.classList.toggle('on',done.has(i));b.textContent=done.has(i)?'Done ✓':'Mark as done';const ck=$(`[data-ck="${i}"]`,D);ck.textContent=done.has(i)?'✓':'';$('#pfill').style.width=(done.size/CH.length*100)+'%';$('#pcnt').textContent=`${done.size} / ${CH.length}`};
+    b.onclick=()=>{done.has(i)?done.delete(i):done.add(i);store.set('sbi-done',[...done]);mark();};
+    sec.appendChild(row);L.appendChild(sec);mark();
+  });
+  const ch=$('#cheat');ch.innerHTML=`<div class="lesson" style="--c:var(--B)"><div class="eyebrow">Keep this</div><h2>Cheat sheet</h2><p class="big">Nobody is an idiot. They just run on a different colour.</p></div>`;
+  $('.lesson',ch).appendChild(M.cheat());
+  // reveal on scroll
+  const io='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');if(e.target._grow)e.target._grow();io.unobserve(e.target)}}),{threshold:.08}):null;
+  document.querySelectorAll('.rv').forEach(n=>{io?io.observe(n):(n.classList.add('in'),n._grow&&n._grow())});
+  // safety: never leave anything hidden
+  setTimeout(()=>document.querySelectorAll('.rv:not(.in)').forEach(n=>{const r=n.getBoundingClientRect();if(r.top<innerHeight*1.2){n.classList.add('in');n._grow&&n._grow()}}),1500);
+  $('#menu').onclick=()=>D.classList.toggle('open');
+  D.onclick=e=>{if(e.target.closest('a'))D.classList.remove('open')};
+  $('#start').onclick=()=>$('#finder').scrollIntoView();
+}
+build();
+</script>
+</body>
+</html>
