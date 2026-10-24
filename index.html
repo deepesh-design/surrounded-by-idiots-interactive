@@ -46,8 +46,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .pbar i{display:block;height:100%;width:0;border-radius:2px;background:var(--B);transition:width .7s var(--ease)}
 .cnt{font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .ibtn{border:0;background:var(--Bbg);color:var(--B);border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px}
-#drawer{position:fixed;z-index:25;top:0;bottom:0;left:0;width:min(340px,88vw);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(30px);backdrop-filter:saturate(180%) blur(30px);padding:calc(64px + env(safe-area-inset-top,0px)) 10px 24px;overflow:auto;transform:translateX(-104%);transition:transform .5s var(--ease);box-shadow:8px 0 40px rgba(0,0,0,.18)}
-#drawer.open{transform:none}
+#drawer{position:fixed;z-index:50;top:0;bottom:0;left:0;width:min(340px,88vw);background:var(--panel);padding:0 10px 24px;overflow:auto;overscroll-behavior:contain;transform:translateX(-104%);visibility:hidden;transition:transform .45s var(--ease),visibility 0s .45s;box-shadow:8px 0 40px rgba(0,0,0,.2)}
+.scrim{position:fixed;inset:0;z-index:45;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .35s}
+.scrim.on{opacity:1;pointer-events:auto}
+.dhead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) 6px 10px;background:var(--panel);margin-bottom:4px}
+.dhead b{font-size:22px;font-weight:700;letter-spacing:-.025em}
+.dclose{width:34px;height:34px;border:0;border-radius:50%;background:var(--chip);color:var(--muted);font-size:16px;line-height:1;display:grid;place-items:center}
+#drawer.open{transform:none;visibility:visible;transition:transform .45s var(--ease),visibility 0s}
 #drawer a{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;color:inherit;text-decoration:none;font-size:15px;line-height:1.3}
 #drawer a:hover{background:var(--line)}
 #drawer .dn{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
@@ -201,16 +206,22 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sky.sun{background:linear-gradient(#6EB8F0,#D8EFFD)}
 .cloud{position:absolute;top:26px;left:8%;width:150px;height:56px;background:#F0F2F6;border-radius:40px;box-shadow:40px -18px 0 8px #F0F2F6,-30px 6px 0 -4px #F0F2F6;transition:opacity 1.2s,transform 1.6s var(--ease)}
 .sky.sun .cloud{opacity:0;transform:translateX(160px)}
-.drops{position:absolute;inset:80px 0 0;opacity:0;background:repeating-linear-gradient(105deg,transparent 0 14px,rgba(10,122,255,.5) 14px 16px);animation:rain .5s linear infinite;transition:opacity .5s}
+.drops{position:absolute;inset:70px 0 0;opacity:0;background:repeating-linear-gradient(105deg,transparent 0 22px,rgba(255,255,255,.55) 22px 23.5px);animation:rain .5s linear infinite;transition:opacity .5s}
 .sky.wet .drops{opacity:1}.sky.sun .drops{opacity:0}
 @keyframes rain{to{background-position:-30px 40px}}
 .sunny{position:absolute;right:12%;top:20px;width:70px;height:70px;border-radius:50%;background:#FFCC00;box-shadow:0 0 0 14px rgba(255,204,0,.28);opacity:0;transform:scale(.3);transition:all 1.1s var(--ease)}
 .sky.sun .sunny{opacity:1;transform:none}
-.rainbow{position:absolute;left:50%;bottom:-70px;width:300px;height:150px;margin-left:-150px;border-radius:150px 150px 0 0;border:14px solid transparent;border-top-color:#FF3B30;opacity:0;transition:opacity 1.2s .6s}
-.sky.sun .rainbow{opacity:.85;box-shadow:inset 0 14px 0 #FFCC00,inset 0 28px 0 #34C759,inset 0 42px 0 #0A7AFF}
-.sky .who{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:60px}
+.rb{position:absolute;left:50%;bottom:0;width:320px;height:160px;margin-left:-160px;opacity:0;transform:scale(.85);transform-origin:50% 100%;transition:opacity 1.6s var(--ease) .4s,transform 1.6s var(--ease) .4s}
+.sky.sun .rb{opacity:.92;transform:none}
+.sky .who{position:absolute;left:50%;bottom:0;width:60px;margin-left:-30px}
 .sky .who .av{width:60px;height:60px}
-.say{position:absolute;left:calc(50% + 40px);bottom:60px;background:#fff;color:#1D1D1F;padding:7px 12px;border-radius:14px;font-weight:600;font-size:14px;max-width:170px;box-shadow:0 4px 14px rgba(0,0,0,.18);line-height:1.3}
+.sky .ground{position:absolute;left:0;right:0;bottom:0;height:10px;background:rgba(0,0,0,.12)}
+.rcap{margin-top:14px;min-height:92px}
+.rcap .ln{animation:pop .6s var(--ease);font-size:20px;line-height:1.3;font-weight:600;letter-spacing:-.02em}
+.rcap .ln small{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.rdots{display:flex;gap:6px;margin-top:10px}
+.rdots i{width:22px;height:4px;border-radius:2px;background:var(--line);transition:background .4s}
+.rdots i.on{background:var(--ink)}
 .gauge{display:grid;gap:12px;max-width:620px;margin-top:10px}
 .g{display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;font-weight:600;font-size:14px}
 .g .tr{height:12px;background:var(--chip);border-radius:6px;overflow:hidden}
@@ -263,7 +274,8 @@ input[type=range]{width:100%;max-width:480px;accent-color:var(--B);margin-top:8p
 <body>
 <script>document.documentElement.classList.add('js')</script>
 <div class="top"><button class="ibtn" id="menu" aria-label="Open chapter list">Chapters</button><span class="nm">Surrounded by Idiots</span><div class="pbar"><i id="pfill"></i></div><span class="cnt" id="pcnt">0 / 22</span></div>
-<nav id="drawer" aria-label="Chapters"></nav>
+<nav id="drawer" aria-label="Chapters" aria-hidden="true"></nav>
+<div class="scrim" id="scrim"></div>
 <main class="wrap">
   <section class="hero">
     <h1>Why do some people drive you up the wall?</h1>
@@ -435,8 +447,27 @@ M.confident=()=>{
 };
 
 M.rain=()=>{
-  const w=el(`<div class="mod rv"><h3>Play: the rain test</h3><div class="sky" id="sky"><span class="cloud"></span><span class="sunny"></span><span class="rainbow"></span><span class="drops"></span><div class="who">${av('Y','happy')}</div><div class="say" hidden></div></div><button class="nextbtn" id="rb">Make it rain</button><p class="hint">The author tells his Yellow sister it will rain. She says the sun comes out after.</p></div>`);
-  $('#rb',w).onclick=async()=>{const s=$('#sky',w),say=$('.say',w),b=$('#rb',w);b.disabled=true;s.classList.remove('sun');s.classList.add('wet');say.hidden=false;say.textContent="I can't imagine that.";await sleep(1800);say.textContent="It's pouring, sure. But the sun comes out after!";await sleep(1800);s.classList.add('sun');s.classList.remove('wet');say.textContent="Told you!";await sleep(1500);b.disabled=false;b.textContent='Again'};
+  const steps=[
+    ["Author","It looks like it's going to rain.","wet"],
+    ["Marita (Yellow)","I can't imagine that.","wet"],
+    ["Author","But look. It's pouring. Thunder soon.","wet"],
+    ["Marita (Yellow)","Sure. But the sun comes out after. Just wait.","wet"],
+    ["Marita (Yellow)","Told you!","sun"]];
+  const w=el(`<div class="mod rv"><h3>Play: the rain test</h3><div class="sky" id="sky"><span class="cloud"></span><span class="drops"></span><span class="sunny"></span><svg class="rb" viewBox="0 0 320 160" aria-hidden="true"><path d="M12,160 A148,148 0 0 1 308,160" stroke="#FF3B30" stroke-width="9" fill="none"/><path d="M21,160 A139,139 0 0 1 299,160" stroke="#FF9500" stroke-width="9" fill="none"/><path d="M30,160 A130,130 0 0 1 290,160" stroke="#FFCC00" stroke-width="9" fill="none"/><path d="M39,160 A121,121 0 0 1 281,160" stroke="#34C759" stroke-width="9" fill="none"/><path d="M48,160 A112,112 0 0 1 272,160" stroke="#0A84FF" stroke-width="9" fill="none"/><path d="M57,160 A103,103 0 0 1 263,160" stroke="#5E5CE6" stroke-width="9" fill="none"/></svg><span class="ground"></span><div class="who">${av('Y','happy')}</div></div><div class="rcap" aria-live="polite"></div><div class="rdots">${steps.map(()=>'<i></i>').join('')}</div><button class="nextbtn" id="rb">Make it rain</button><p class="hint">A real moment from the book: the author warns his Yellow sister about rain. She stays sure the sun is coming.</p></div>`);
+  let run=0;
+  $('#rb',w).onclick=async()=>{
+    const my=++run,s=$('#sky',w),cap=$('.rcap',w),b=$('#rb',w),dots=w.querySelectorAll('.rdots i');
+    b.disabled=true;s.classList.remove('sun');s.classList.remove('wet');
+    for(let i=0;i<steps.length;i++){
+      if(my!==run)return;
+      const [who,tx,st]=steps[i];
+      if(st==='wet'){s.classList.add('wet');s.classList.remove('sun')}else{s.classList.remove('wet');s.classList.add('sun')}
+      cap.innerHTML=`<div class="ln"><small>${who}</small>${tx}</div>`;
+      dots.forEach((d,j)=>d.classList.toggle('on',j<=i));
+      await sleep(i===steps.length-1?4200:4300);
+    }
+    b.disabled=false;b.textContent='Watch again';
+  };
   return w;
 };
 
@@ -744,7 +775,7 @@ function build(){
   ['R','Y','G','B'].forEach(k=>cast.appendChild(el(`<div class="mc" style="--c:${col(k)};--cbg:${cbg(k)}">${av(k,k==='R'?'mad':'happy')}<h3>${CO[k].n}</h3><p class="role">${MEET[k][0]}</p><p style="margin:0">${MEET[k][1]}</p><div class="says"><small>At the trip meeting they say</small>"${MEET[k][2]}"</div></div>`)));
   buildFinder();
   const L=$('#lessons'),D=$('#drawer');
-  D.innerHTML=CH.map((c,i)=>`<a href="#ch${i}"><span class="dn" style="background:${col(c.k)}">${c.n}</span>${c.t}<span class="ck" data-ck="${i}"></span></a>`).join('');
+  D.innerHTML='<div class="dhead"><b>Chapters</b><button class="dclose" id="dclose" aria-label="Close chapter list">✕</button></div>'+CH.map((c,i)=>`<a href="#ch${i}"><span class="dn" style="background:${col(c.k)}">${c.n}</span>${c.t}<span class="ck" data-ck="${i}"></span></a>`).join('');
   CH.forEach((c,i)=>{
     const sec=el(`<section class="lesson" id="ch${i}" style="--c:${col(c.k==='N'?'B':c.k)};--cbg:${cbg(c.k==='N'?'B':c.k)}"><div class="eyebrow">${i?'Chapter '+c.n:'Introduction'}</div><h2>${c.t}</h2></section>`);
     const T=TALK[i];
@@ -765,8 +796,12 @@ function build(){
   document.querySelectorAll('.rv').forEach(n=>{io?io.observe(n):(n.classList.add('in'),n._grow&&n._grow())});
   // safety: never leave anything hidden
   setTimeout(()=>document.querySelectorAll('.rv:not(.in)').forEach(n=>{const r=n.getBoundingClientRect();if(r.top<innerHeight*1.2){n.classList.add('in');n._grow&&n._grow()}}),1500);
-  $('#menu').onclick=()=>D.classList.toggle('open');
-  D.onclick=e=>{if(e.target.closest('a'))D.classList.remove('open')};
+  const setDrawer=o=>{D.classList.toggle('open',o);$('#scrim').classList.toggle('on',o);D.setAttribute('aria-hidden',!o);document.body.style.overflow=o?'hidden':''};
+  $('#menu').onclick=()=>setDrawer(true);
+  $('#dclose').onclick=()=>setDrawer(false);
+  $('#scrim').onclick=()=>setDrawer(false);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')setDrawer(false)});
+  D.onclick=e=>{if(e.target.closest('a'))setDrawer(false)};
   $('#start').onclick=()=>$('#finder').scrollIntoView();
 }
 build();
