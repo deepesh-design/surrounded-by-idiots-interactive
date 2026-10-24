@@ -202,7 +202,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .mx .ax{position:absolute;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .mx .dot{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.3);cursor:grab;display:grid;place-items:center;color:var(--bg);font-weight:700;touch-action:none}
 .mx .dot:active{cursor:grabbing;transform:scale(1.12)}
-.sky{position:relative;height:220px;border-radius:24px;overflow:hidden;background:linear-gradient(#8E99AB,#C4CCD9);transition:background 1.4s;margin-top:10px}
+.sky{position:relative;height:280px;border-radius:24px;overflow:hidden;background:linear-gradient(#8E99AB,#C4CCD9);transition:background 1.4s;margin-top:10px}
 .sky.sun{background:linear-gradient(#6EB8F0,#D8EFFD)}
 .cloud{position:absolute;top:26px;left:8%;width:150px;height:56px;background:#F0F2F6;border-radius:40px;box-shadow:40px -18px 0 8px #F0F2F6,-30px 6px 0 -4px #F0F2F6;transition:opacity 1.2s,transform 1.6s var(--ease)}
 .sky.sun .cloud{opacity:0;transform:translateX(160px)}
@@ -216,7 +216,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sky .who{position:absolute;left:50%;bottom:0;width:60px;margin-left:-30px}
 .sky .who .av{width:60px;height:60px}
 .sky .ground{position:absolute;left:0;right:0;bottom:0;height:10px;background:rgba(0,0,0,.12)}
-.rcap{margin-top:14px;min-height:92px}
+.sky .who2{position:absolute;left:11%;bottom:0;width:52px}
+.sky .who2 .av{width:52px;height:52px}
+.sky .who{z-index:2}
+.say{position:absolute;z-index:4;top:22px;max-width:min(300px,64%);background:#fff;color:#1D1D1F;padding:12px 16px;border-radius:20px;box-shadow:0 8px 28px rgba(0,0,0,.2);line-height:1.3;transition:left .6s var(--ease),transform .6s var(--ease);animation:pop .55s var(--ease)}
+.say small{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#6E6E73;margin-bottom:2px}
+.say b{font-size:19px;font-weight:600;letter-spacing:-.02em;display:block}
+.say:after{content:"";position:absolute;bottom:-9px;left:var(--tail,50%);width:18px;height:18px;margin-left:-9px;background:#fff;transform:rotate(45deg);border-radius:0 0 5px 0}
+.say.me{left:calc(11% - 10px);--tail:36px}
+.say.mar{left:50%;transform:translateX(-50%);--tail:50%}
+@media (max-width:640px){.say.me{left:8px}.say b{font-size:17px}}
 .rcap .ln{animation:pop .6s var(--ease);font-size:20px;line-height:1.3;font-weight:600;letter-spacing:-.02em}
 .rcap .ln small{display:block;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
 .rdots{display:flex;gap:6px;margin-top:10px}
@@ -448,23 +457,23 @@ M.confident=()=>{
 
 M.rain=()=>{
   const steps=[
-    ["Author","It looks like it's going to rain.","wet"],
-    ["Marita (Yellow)","I can't imagine that.","wet"],
-    ["Author","But look. It's pouring. Thunder soon.","wet"],
-    ["Marita (Yellow)","Sure. But the sun comes out after. Just wait.","wet"],
-    ["Marita (Yellow)","Told you!","sun"]];
-  const w=el(`<div class="mod rv"><h3>Play: the rain test</h3><div class="sky" id="sky"><span class="cloud"></span><span class="drops"></span><span class="sunny"></span><svg class="rb" viewBox="0 0 320 160" aria-hidden="true"><path d="M12,160 A148,148 0 0 1 308,160" stroke="#FF3B30" stroke-width="9" fill="none"/><path d="M21,160 A139,139 0 0 1 299,160" stroke="#FF9500" stroke-width="9" fill="none"/><path d="M30,160 A130,130 0 0 1 290,160" stroke="#FFCC00" stroke-width="9" fill="none"/><path d="M39,160 A121,121 0 0 1 281,160" stroke="#34C759" stroke-width="9" fill="none"/><path d="M48,160 A112,112 0 0 1 272,160" stroke="#0A84FF" stroke-width="9" fill="none"/><path d="M57,160 A103,103 0 0 1 263,160" stroke="#5E5CE6" stroke-width="9" fill="none"/></svg><span class="ground"></span><div class="who">${av('Y','happy')}</div></div><div class="rcap" aria-live="polite"></div><div class="rdots">${steps.map(()=>'<i></i>').join('')}</div><button class="nextbtn" id="rb">Make it rain</button><p class="hint">A real moment from the book: the author warns his Yellow sister about rain. She stays sure the sun is coming.</p></div>`);
+    ["Author","me","It looks like it's going to rain.","wet"],
+    ["Marita (Yellow)","mar","I can't imagine that.","wet"],
+    ["Author","me","But look. It's pouring. Thunder soon.","wet"],
+    ["Marita (Yellow)","mar","Sure. But the sun comes out after. Just wait.","wet"],
+    ["Marita (Yellow)","mar","Told you!","sun"]];
+  const w=el(`<div class="mod rv"><h3>Play: the rain test</h3><div class="sky" id="sky"><span class="cloud"></span><span class="drops"></span><span class="sunny"></span><svg class="rb" viewBox="0 0 320 160" aria-hidden="true"><path d="M12,160 A148,148 0 0 1 308,160" stroke="#FF3B30" stroke-width="9" fill="none"/><path d="M21,160 A139,139 0 0 1 299,160" stroke="#FF9500" stroke-width="9" fill="none"/><path d="M30,160 A130,130 0 0 1 290,160" stroke="#FFCC00" stroke-width="9" fill="none"/><path d="M39,160 A121,121 0 0 1 281,160" stroke="#34C759" stroke-width="9" fill="none"/><path d="M48,160 A112,112 0 0 1 272,160" stroke="#0A84FF" stroke-width="9" fill="none"/><path d="M57,160 A103,103 0 0 1 263,160" stroke="#5E5CE6" stroke-width="9" fill="none"/></svg><span class="ground"></span><div class="who2">${av('N','happy')}</div><div class="who">${av('Y','happy')}</div><div class="say me" id="say" aria-live="polite"></div></div><div class="rdots">${steps.map(()=>'<i></i>').join('')}</div><button class="nextbtn" id="rb">Make it rain</button><p class="hint">A real moment from the book: the author warns his Yellow sister about rain. She stays sure the sun is coming.</p></div>`);
   let run=0;
   $('#rb',w).onclick=async()=>{
-    const my=++run,s=$('#sky',w),cap=$('.rcap',w),b=$('#rb',w),dots=w.querySelectorAll('.rdots i');
+    const my=++run,s=$('#sky',w),b=$('#rb',w),dots=w.querySelectorAll('.rdots i');
     b.disabled=true;s.classList.remove('sun');s.classList.remove('wet');
     for(let i=0;i<steps.length;i++){
       if(my!==run)return;
-      const [who,tx,st]=steps[i];
+      const [who,pos,tx,st]=steps[i];
       if(st==='wet'){s.classList.add('wet');s.classList.remove('sun')}else{s.classList.remove('wet');s.classList.add('sun')}
-      cap.innerHTML=`<div class="ln"><small>${who}</small>${tx}</div>`;
+      const old=$('#say',w),n=old.cloneNode(false);n.className='say '+pos;n.innerHTML=`<small>${who}</small><b>${tx}</b>`;old.replaceWith(n);
       dots.forEach((d,j)=>d.classList.toggle('on',j<=i));
-      await sleep(i===steps.length-1?4200:4300);
+      await sleep(4300);
     }
     b.disabled=false;b.textContent='Watch again';
   };
